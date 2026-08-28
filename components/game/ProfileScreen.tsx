@@ -13,16 +13,20 @@ export default function ProfileScreen({
 }) {
   const setScreen = useGame((s) => s.setScreen);
   const openPortal = useGame((s) => s.openPortal);
+  const liveLevel = useGame((s) => s.level);
+  const liveFitness = useGame((s) => s.fitnessScore);
+  const liveXp = useGame((s) => s.xp);
+  const liveStreak = useGame((s) => s.streak);
 
   const enterGym = () => {
     sound.whoosh();
-    setScreen("gym");
+    setScreen("loading");
     useGame.getState().setObjective("EXPLORE THE TRAINING FLOOR");
   };
   const startProgram = () => {
     sound.whoosh();
-    setScreen("gym");
-    window.setTimeout(() => openPortal("programs"), 750);
+    setScreen("loading");
+    window.setTimeout(() => openPortal("programs"), 2500);
   };
 
   return (
@@ -73,7 +77,7 @@ export default function ProfileScreen({
                 initial={{ strokeDashoffset: 2 * Math.PI * 52 }}
                 animate={{
                   strokeDashoffset:
-                    2 * Math.PI * 52 * (1 - PROFILE.level / 100),
+                    2 * Math.PI * 52 * (1 - liveLevel / 100),
                 }}
                 transition={{ delay: 0.6, duration: 1.4, ease: "easeOut" }}
                 style={{ filter: "drop-shadow(0 0 10px rgba(74,158,255,0.6))" }}
@@ -81,7 +85,7 @@ export default function ProfileScreen({
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <span className="font-display text-3xl text-white">
-                {PROFILE.level}
+                {liveLevel}
               </span>
               <span className="text-[9px] tracking-[0.3em] text-muted">
                 LEVEL
@@ -96,25 +100,29 @@ export default function ProfileScreen({
               <div className="flex items-end justify-between text-[11px] tracking-[0.24em]">
                 <span className="text-white/80">FITNESS SCORE</span>
                 <Counter
-                  to={PROFILE.fitnessScore}
+                  to={liveFitness}
                   className="font-display text-2xl text-accent text-glow"
                 />
               </div>
-              <Bar value={PROFILE.fitnessScore} color="accent" delay={0.5} />
+              <Bar value={liveFitness} color="accent" delay={0.5} />
             </div>
             <div>
               <div className="flex items-end justify-between text-[11px] tracking-[0.24em]">
                 <span className="text-white/80">XP → NEXT LEVEL</span>
                 <Counter
-                  to={100}
+                  to={Math.min(100, Math.round((liveXp / PROFILE.xpNext) * 100))}
                   className="font-display text-2xl text-white"
                   suffix="%"
                 />
               </div>
-              <Bar value={100} color="white" delay={0.7} />
+              <Bar
+                value={Math.min(100, Math.round((liveXp / PROFILE.xpNext) * 100))}
+                color="white"
+                delay={0.7}
+              />
               <div className="mt-2 flex justify-between text-[10px] tracking-[0.2em] text-muted">
-                <span>{PROFILE.xp.toLocaleString()} XP</span>
-                <span>{PROFILE.xpNext.toLocaleString()} XP</span>
+                <span>{liveXp.toLocaleString()} XP</span>
+                <span>{PROFILE.xpNext.toLocaleString()} XP · STREAK {liveStreak}</span>
               </div>
             </div>
             <div className="space-y-3">

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { CINEMATIC_LINES, ZONES } from "./data";
+import { CINEMATIC_LINES } from "./data";
 import { MOTION_PREF, useGame, type PortalId } from "./store";
 import { sound } from "./sound";
 import IntroScreen from "./IntroScreen";
@@ -11,7 +11,10 @@ import Hud from "./Hud";
 import PortalContent from "./PortalContent";
 import TunnelFlash from "./TunnelFlash";
 import CustomCursor from "./CustomCursor";
+import LoadingScreen from "./LoadingScreen";
+import TouchControls from "./TouchControls";
 import GameScene from "./three/GameScene";
+import { IS_MOBILE } from "./store";
 
 function CutsceneLines() {
   const gymEntries = useGame((s) => s.gymEntries);
@@ -75,7 +78,7 @@ export default function GameRoot() {
   }, [soundOn]);
 
   useEffect(() => {
-    if (MOTION_PREF) useGame.setState({ cameraMode: "hub" });
+    if (MOTION_PREF) useGame.setState({ screen: "gym" });
   }, []);
 
   useEffect(() => {
@@ -98,7 +101,7 @@ export default function GameRoot() {
       useGame.getState().setScreen("gym");
     }, 400);
     const t2 = window.setTimeout(() => {
-      useGame.getState().openPortal(id, ZONES[id].anchor);
+      useGame.getState().openPortal(id);
     }, 2200);
     return () => {
       window.clearTimeout(t1);
@@ -124,6 +127,7 @@ export default function GameRoot() {
       <div className="scanlines" />
 
       {screen === "intro" && <IntroScreen />}
+      {screen === "loading" && <LoadingScreen />}
       {screen === "profile" && <ProfileScreen />}
 
       <PortalContent />
@@ -131,6 +135,9 @@ export default function GameRoot() {
 
       {screen === "gym" && (
         <Hud onProfile={() => setProfilePanel(true)} />
+      )}
+      {screen === "gym" && IS_MOBILE && (
+        <TouchControls onMap={() => useGame.getState().setMapOpen(true)} />
       )}
 
       {profilePanel && screen === "gym" && (

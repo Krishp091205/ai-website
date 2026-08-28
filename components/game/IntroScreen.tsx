@@ -100,9 +100,10 @@ export function StartScreen() {
       setScreen("profile");
     } else {
       sound.whoosh();
-      setScreen("gym");
-      if (id === "programs") window.setTimeout(() => openPortal("programs"), 750);
-      if (id === "membership") window.setTimeout(() => openPortal("membership"), 750);
+      useGame.getState().resetProgression();
+      setScreen("loading");
+      if (id === "programs") window.setTimeout(() => openPortal("programs"), 2500);
+      if (id === "membership") window.setTimeout(() => openPortal("membership"), 2500);
     }
   };
 
