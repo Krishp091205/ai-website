@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { CINEMATIC_LINES } from "./data";
-import { MOTION_PREF, useGame } from "./store";
+import { CINEMATIC_LINES, ZONES } from "./data";
+import { MOTION_PREF, useGame, type PortalId } from "./store";
 import { sound } from "./sound";
 import IntroScreen from "./IntroScreen";
 import ProfileScreen from "./ProfileScreen";
@@ -76,6 +76,34 @@ export default function GameRoot() {
 
   useEffect(() => {
     if (MOTION_PREF) useGame.setState({ cameraMode: "hub" });
+  }, []);
+
+  useEffect(() => {
+    const cb = useGame.getState().settings.colorblind;
+    document.documentElement.dataset.cb = String(cb);
+    const un = useGame.subscribe((s) => {
+      document.documentElement.dataset.cb = String(s.settings.colorblind);
+    });
+    return () => un();
+  }, []);
+
+  useEffect(() => {
+    const m = window.location.hash.match(/^#zone\/([a-z-]+)$/);
+    if (!m) return;
+    const id = m[1] as PortalId;
+    const valid = ["about", "programs", "trainers", "facility", "membership", "contact"].includes(id);
+    if (!valid) return;
+    if (MOTION_PREF) return;
+    const t1 = window.setTimeout(() => {
+      useGame.getState().setScreen("gym");
+    }, 400);
+    const t2 = window.setTimeout(() => {
+      useGame.getState().openPortal(id, ZONES[id].anchor);
+    }, 2200);
+    return () => {
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+    };
   }, []);
 
   useEffect(() => {

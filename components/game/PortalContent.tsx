@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ABOUT_COPY,
@@ -39,7 +39,11 @@ export default function PortalContent() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
+      if (e.key !== "Escape") return;
+      const st = useGame.getState();
+      if (!st.portalOpen) return;
+      if (document.querySelector('[role="dialog"]')) return;
+      close();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -478,9 +482,50 @@ function TrainerDetail({
 
 function ContactBody() {
   const [sent, setSent] = useState(false);
-  const submit = (e: React.FormEvent) => {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     sound.whoosh();
+    if (busy) return;
+    const form = formRef.current;
+    if (!form) return;
+    const data = Object.fromEntries(new FormData(form).entries());
+    const name = String(data.name ?? "");
+    const contact = String(data.contact ?? "");
+    const email = String(data.email ?? "");
+    const message = String(data.message ?? "");
+
+    const endpoint =
+      typeof process !== "undefined" && process.env.NEXT_PUBLIC_FORM_ENDPOINT;
+
+    if (endpoint) {
+      setBusy(true);
+      setError(null);
+      try {
+        await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, contact, email, message, source: "gymverse" }),
+        });
+        setSent(true);
+      } catch {
+        setError("TRANSMISSION FAILED — TRY EMAIL INSTEAD");
+      } finally {
+        setBusy(false);
+      }
+      return;
+    }
+
+    const subject = encodeURIComponent(
+      `GYMVERSE inquiry — ${name || "New member"}`
+    );
+    const body = encodeURIComponent(
+      `Name: ${name}\nPhone: ${contact}\nEmail: ${email}\n\n${message}`
+    );
+    window.location.href = `mailto:${CONTACT_INFO.email}?subject=${subject}&body=${body}`;
     setSent(true);
   };
   return (
@@ -519,32 +564,44 @@ function ContactBody() {
               TRANSMISSION RECEIVED
             </div>
             <p className="mt-3 text-sm text-white/70">
-              A coach will reach out within 24 hours. The grind waits for no one.
+              Your transmission is on its way. A coach replies within 24 hours — the grind waits for no one.
             </p>
           </div>
         ) : (
-          <form onSubmit={submit} className="hud-panel space-y-4 rounded-sm p-6">
+          <form ref={formRef} onSubmit={submit} className="hud-panel space-y-4 rounded-sm p-6">
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="NAME" type="text" placeholder="KHALID" />
-              <Field label="CONTACT" type="tel" placeholder="+91 00000 00000" />
+              <Field label="NAME" name="name" type="text" placeholder="KHALID" />
+              <Field
+                label="CONTACT"
+                name="contact"
+                type="tel"
+                placeholder="+91 00000 00000"
+              />
             </div>
-            <Field label="EMAIL" type="email" placeholder="you@grind.fit" />
+            <Field label="EMAIL" name="email" type="email" placeholder="you@grind.fit" />
             <div>
               <label className="block text-[10px] tracking-[0.26em] text-muted">
                 MESSAGE
               </label>
               <textarea
+                name="message"
                 rows={4}
                 placeholder="I want to know more about the TITAN membership…"
                 className="mt-2 w-full rounded-sm border border-line bg-black/40 px-4 py-3 text-sm text-white placeholder:text-white/25 focus:border-accent focus:outline-none"
               />
             </div>
+            {error && (
+              <div className="text-[10px] tracking-[0.26em] text-red-400">
+                {error}
+              </div>
+            )}
             <button
               data-cursor="SELECT"
               type="submit"
-              className="w-full rounded-sm bg-accent py-4 font-display text-xs tracking-[0.3em] text-black transition-colors hover:bg-white"
+              disabled={busy}
+              className="w-full rounded-sm bg-accent py-4 font-display text-xs tracking-[0.3em] text-black transition-colors hover:bg-white disabled:opacity-50"
             >
-              TRANSMIT INQUIRY
+              {busy ? "TRANSMITTING…" : "TRANSMIT INQUIRY"}
             </button>
           </form>
         )}
@@ -555,10 +612,12 @@ function ContactBody() {
 
 function Field({
   label,
+  name,
   type,
   placeholder,
 }: {
   label: string;
+  name: string;
   type: string;
   placeholder: string;
 }) {
@@ -568,6 +627,7 @@ function Field({
         {label}
       </label>
       <input
+        name={name}
         type={type}
         placeholder={placeholder}
         required

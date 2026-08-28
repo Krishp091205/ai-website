@@ -25,6 +25,7 @@ export interface Settings {
   cinematics: boolean;
   quality: Quality;
   hudBrightness: number;
+  colorblind: boolean;
 }
 
 interface CursorState {
@@ -80,6 +81,7 @@ export const useGame = create<GameState>((set, get) => ({
     cinematics: true,
     quality: "high",
     hudBrightness: 1,
+    colorblind: false,
   },
   setScreen: (screen) =>
     set({
@@ -106,12 +108,24 @@ export const useGame = create<GameState>((set, get) => ({
     window.setTimeout(() => {
       set({ portalOpen: id, cameraMode: "content", flyTarget: null, flash: null });
     }, 1500);
+    try {
+      if (typeof window !== "undefined")
+        window.history.replaceState(null, "", `#zone/${id}`);
+    } catch {
+      /* ignore */
+    }
   },
   closePortal: () => {
     set({ cameraMode: "flyOut", portalOpen: null, contentLook: null, flash: "dark" });
     window.setTimeout(() => {
       set({ cameraMode: "hub", flyTarget: null, flash: null });
     }, 1200);
+    try {
+      if (typeof window !== "undefined")
+        window.history.replaceState(null, "", window.location.pathname + window.location.search);
+    } catch {
+      /* ignore */
+    }
   },
   setFlyTarget: (t) => set({ flyTarget: t }),
   completeFly: () => set({ flyTarget: null }),

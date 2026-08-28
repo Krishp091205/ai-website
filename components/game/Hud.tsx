@@ -14,6 +14,7 @@ export default function Hud({ onProfile }: { onProfile: () => void }) {
   const cinematics = useGame((s) => s.settings.cinematics);
   const quality = useGame((s) => s.settings.quality);
   const hudBrightness = useGame((s) => s.settings.hudBrightness);
+  const colorblind = useGame((s) => s.settings.colorblind);
   const setSettings = useGame((s) => s.setSettings);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
@@ -22,10 +23,9 @@ export default function Hud({ onProfile }: { onProfile: () => void }) {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key !== "Escape" || !useGame.getState().portalOpen) return;
-      if (!menuOpen && !mapOpen) return;
-      setMenuOpen(false);
-      setMapOpen(false);
+      if (e.key !== "Escape") return;
+      if (menuOpen) setMenuOpen(false);
+      if (mapOpen) setMapOpen(false);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -300,6 +300,11 @@ export default function Hud({ onProfile }: { onProfile: () => void }) {
                       setSettings({ quality: next });
                       sound.click();
                     }}
+                  />
+                  <Toggle
+                    label="COLORBLIND MODE"
+                    on={colorblind}
+                    onClick={() => setSettings({ colorblind: !colorblind })}
                   />
                   <div>
                     <div className="flex items-center justify-between text-[11px] tracking-[0.24em] text-white/70">
