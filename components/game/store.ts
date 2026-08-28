@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { ZONES } from "./data";
 
 export type Screen = "intro" | "start" | "profile" | "gym";
 export type PortalId =
@@ -38,6 +39,8 @@ interface GameState {
   portalOpen: PortalId | null;
   cameraMode: CameraMode;
   flyTarget: FlyTarget | null;
+  contentLook: [number, number, number] | null;
+  flash: "bright" | "dark" | null;
   cursor: CursorState;
   objective: string;
   objectiveDone: boolean;
@@ -63,6 +66,8 @@ export const useGame = create<GameState>((set, get) => ({
   portalOpen: null,
   cameraMode: "intro",
   flyTarget: null,
+  contentLook: null,
+  flash: null,
   cursor: { label: null, sub: null, x: -100, y: -100 },
   objective: "Enter the GYMVERSE",
   objectiveDone: false,
@@ -87,28 +92,26 @@ export const useGame = create<GameState>((set, get) => ({
   setReplayIntro: (v) => set({ replayIntro: v }),
   setProfilePanel: (v) => set({ profilePanel: v }),
   openPortal: (id, target) => {
-    const fly =
-      target ??
-      ({ to: [0, 1.7, 7.2], look: [0, 1.7, -1.5] } as {
-        to: FlyTarget["to"];
-        look: FlyTarget["look"];
-      });
+    const anchor = ZONES[id].anchor;
+    const fly = target ?? anchor;
     set({
       cameraMode: "flyIn",
       portalOpen: null,
+      flash: "bright",
       flyTarget: { to: fly.to, look: fly.look, mode: "flyIn" },
+      contentLook: fly.look,
       objective: `ACCESSING ${id.toUpperCase()} ZONE`,
       objectiveDone: false,
     });
     window.setTimeout(() => {
-      set({ portalOpen: id, cameraMode: "content", flyTarget: null });
+      set({ portalOpen: id, cameraMode: "content", flyTarget: null, flash: null });
     }, 1500);
   },
   closePortal: () => {
-    set({ cameraMode: "flyOut", portalOpen: null });
+    set({ cameraMode: "flyOut", portalOpen: null, contentLook: null, flash: "dark" });
     window.setTimeout(() => {
-      set({ cameraMode: "hub", flyTarget: null });
-    }, 1100);
+      set({ cameraMode: "hub", flyTarget: null, flash: null });
+    }, 1200);
   },
   setFlyTarget: (t) => set({ flyTarget: t }),
   completeFly: () => set({ flyTarget: null }),

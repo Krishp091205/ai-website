@@ -405,22 +405,26 @@ function Athlete({
 }
 
 export default function GymHub({ reduced }: { reduced: boolean }) {
+  const wall = (p: [number, number, number], s: [number, number, number]) => (
+    <mesh key={p.join(",")} position={p} receiveShadow>
+      <boxGeometry args={s} />
+      <meshStandardMaterial color="#141417" metalness={0.4} roughness={0.55} />
+    </mesh>
+  );
   return (
     <group>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, -1.5]} receiveShadow>
         <planeGeometry args={[24, 22]} />
         <meshStandardMaterial color="#0d0d0f" metalness={0.25} roughness={0.8} />
       </mesh>
-      {[-11.1, 11.1].map((x) => (
-        <mesh key={x} position={[x, 1.2, -1.5]} receiveShadow>
-          <boxGeometry args={[0.2, 3.2, 22]} />
-          <meshStandardMaterial color="#141417" metalness={0.4} roughness={0.55} />
-        </mesh>
-      ))}
-      <mesh position={[0, 1.2, -10.6]} receiveShadow>
-        <boxGeometry args={[22.4, 3.2, 0.2]} />
-        <meshStandardMaterial color="#141417" metalness={0.4} roughness={0.55} />
-      </mesh>
+      {wall([-11.1, 1.2, -9.35], [0.2, 3.2, 6.3])}
+      {wall([-11.1, 1.2, -0.75], [0.2, 3.2, 6.2])}
+      {wall([-11.1, 1.2, 7.1], [0.2, 3.2, 4.8])}
+      {wall([11.1, 1.2, -8.1], [0.2, 3.2, 8.8])}
+      {wall([11.1, 1.2, 0.4], [0.2, 3.2, 3.5])}
+      {wall([11.1, 1.2, 6.98], [0.2, 3.2, 5])}
+      {wall([-3.9, 1.2, -10.6], [14.4, 3.2, 0.2])}
+      {wall([8.4, 1.2, -10.6], [5.4, 3.2, 0.2])}
       <mesh position={[0, 5.6, -1.5]} receiveShadow>
         <boxGeometry args={[22.4, 0.18, 22]} />
         <meshStandardMaterial color="#101013" metalness={0.6} roughness={0.4} />

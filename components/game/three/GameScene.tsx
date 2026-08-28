@@ -8,6 +8,7 @@ import { IS_MOBILE, useGame } from "../store";
 import CameraRig from "./CameraRig";
 import GymHub from "./GymHub";
 import Portals from "./Portals";
+import ZoneEnvironments from "./ZoneEnvironments";
 
 function FlickerLight({
   position,
@@ -59,6 +60,7 @@ export default function GameScene() {
       <CameraRig />
       <GymHub reduced={!high} />
       <Portals />
+      <ZoneEnvironments />
 
       <ambientLight intensity={high ? 0.3 : 0.5} />
       <hemisphereLight

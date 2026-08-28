@@ -9,6 +9,7 @@ import IntroScreen from "./IntroScreen";
 import ProfileScreen from "./ProfileScreen";
 import Hud from "./Hud";
 import PortalContent from "./PortalContent";
+import TunnelFlash from "./TunnelFlash";
 import CustomCursor from "./CustomCursor";
 import GameScene from "./three/GameScene";
 
@@ -98,6 +99,7 @@ export default function GameRoot() {
       {screen === "profile" && <ProfileScreen />}
 
       <PortalContent />
+      <TunnelFlash />
 
       {screen === "gym" && (
         <Hud onProfile={() => setProfilePanel(true)} />

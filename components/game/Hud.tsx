@@ -2,12 +2,11 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { PORTALS, PROFILE } from "./data";
-import { useGame } from "./store";
+import { PORTALS, PROFILE, ZONES } from "./data";
+import { useGame, type PortalId } from "./store";
 import { sound } from "./sound";
 
 export default function Hud({ onProfile }: { onProfile: () => void }) {
-  const portalOpen = useGame((s) => s.portalOpen);
   const cameraMode = useGame((s) => s.cameraMode);
   const objective = useGame((s) => s.objective);
   const objectiveDone = useGame((s) => s.objectiveDone);
@@ -15,7 +14,6 @@ export default function Hud({ onProfile }: { onProfile: () => void }) {
   const setSettings = useGame((s) => s.setSettings);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
-  const openPortal = useGame((s) => s.openPortal);
 
   const visible = cameraMode !== "intro" && cameraMode !== "content";
 
@@ -24,6 +22,16 @@ export default function Hud({ onProfile }: { onProfile: () => void }) {
     sound.setEnabled(next);
     setSettings({ sound: next });
     if (next) sound.click();
+  };
+
+  const travelTo = (id: PortalId) => {
+    sound.whoosh();
+    setMapOpen(false);
+    window.setTimeout(() => {
+      const st = useGame.getState();
+      if (st.portalOpen) return;
+      st.openPortal(id, ZONES[id].anchor);
+    }, 250);
   };
 
   return (
@@ -130,9 +138,14 @@ export default function Hud({ onProfile }: { onProfile: () => void }) {
                 className="hud-panel w-[92vw] max-w-2xl rounded-sm p-8"
               >
                 <div className="flex items-center justify-between">
-                  <h2 className="font-display text-2xl tracking-[0.2em] text-white">
-                    WORLD MAP
-                  </h2>
+                  <div>
+                    <h2 className="font-display text-2xl tracking-[0.2em] text-white">
+                      WORLD MAP
+                    </h2>
+                    <p className="mt-1 text-[10px] tracking-[0.26em] text-muted">
+                      TAP A ZONE TO FAST-TRAVEL
+                    </p>
+                  </div>
                   <button
                     data-cursor="SELECT"
                     className="text-muted transition-colors hover:text-white"
@@ -145,31 +158,54 @@ export default function Hud({ onProfile }: { onProfile: () => void }) {
                     ESC ✕
                   </button>
                 </div>
-                <div className="mt-6 grid grid-cols-1 gap-2 sm:grid-cols-2">
-                  {PORTALS.map((p, i) => (
-                    <button
-                      key={p.id}
-                      data-cursor={p.command}
-                      onClick={() => {
-                        sound.whoosh();
-                        setMapOpen(false);
-                        window.setTimeout(() => {
-                          if (portalOpen) return;
-                          openPortal(p.id);
-                          // openPortal already schedules portalOpen set at 1400ms; fine
-                        }, 250);
-                      }}
-                      className="group flex items-center justify-between border border-line px-4 py-3 text-left transition-colors hover:border-accent/50"
-                    >
-                      <span className="font-display text-sm tracking-[0.2em] text-white/80 group-hover:text-white">
-                        {p.name}
-                      </span>
-                      <span className="text-[10px] tracking-[0.24em] text-muted group-hover:text-accent">
-                        <span className="mr-2 text-white/40">0{i + 1}</span>
-                        {p.tagline}
-                      </span>
-                    </button>
-                  ))}
+
+                <div className="relative mt-6 h-[300px] overflow-hidden rounded-sm border border-line bg-[radial-gradient(100%_100%_at_50%_50%,#0d1119_0%,#07070a_100%)]">
+                  {PORTALS.map((p) => {
+                    const [mx, my] = project(p.position);
+                    return (
+                      <motion.button
+                        key={p.id}
+                        initial={{ opacity: 0, scale: 0.5 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.05 * mapIndex(p.id) }}
+                        data-cursor={p.command}
+                        onClick={() => travelTo(p.id)}
+                        className="group absolute z-10"
+                        style={{ left: mx - 14, top: my - 14 }}
+                      >
+                        <span
+                          className="flex h-7 w-7 items-center justify-center rounded-full border transition-transform group-hover:scale-125 animate-float"
+                          style={{
+                            borderColor: ZONES[p.id].accent,
+                            boxShadow: `0 0 12px ${ZONES[p.id].accent}66`,
+                            background: `${ZONES[p.id].accent}14`,
+                          }}
+                        >
+                          <span
+                            className="h-2 w-2 rounded-full"
+                            style={{ background: ZONES[p.id].accent }}
+                          />
+                        </span>
+                        <span className="absolute left-1/2 top-full mt-1 whitespace-nowrap -translate-x-1/2 text-[9px] tracking-[0.22em] text-white/60 group-hover:text-white">
+                          {p.name}
+                        </span>
+                      </motion.button>
+                    );
+                  })}
+
+                  <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-1.5">
+                    <span className="relative flex h-4 w-4 items-center justify-center">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent/50" />
+                      <span className="relative h-3 w-3 rounded-full border border-accent bg-accent/30" />
+                    </span>
+                    <span className="text-[9px] tracking-[0.24em] text-accent">
+                      YOU ARE HERE — HUB
+                    </span>
+                  </span>
+
+                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[9px] tracking-[0.26em] text-white/25">
+                    42 IRON ST · GYMVERSE COMPLEX
+                  </div>
                 </div>
               </motion.div>
             )}
@@ -258,4 +294,21 @@ function Toggle({
       </span>
     </button>
   );
+}
+
+const MAP_ORDER: Record<string, number> = {
+  about: 0,
+  programs: 1,
+  trainers: 2,
+  facility: 3,
+  membership: 4,
+  contact: 5,
+};
+
+function mapIndex(id: string) {
+  return MAP_ORDER[id] ?? 0;
+}
+
+function project(p: [number, number, number]): [number, number] {
+  return [150 + p[0] * 5.6, 150 - p[2] * 5.8];
 }

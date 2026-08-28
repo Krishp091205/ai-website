@@ -11,6 +11,7 @@ const easeInOutCubic = (t: number) =>
 export default function CameraRig() {
   const cameraMode = useGame((s) => s.cameraMode);
   const flyTarget = useGame((s) => s.flyTarget);
+  const contentLook = useGame((s) => s.contentLook);
   const { camera } = useThree();
 
   const modeRef = useRef(cameraMode);
@@ -97,7 +98,13 @@ export default function CameraRig() {
         break;
       }
       case "content": {
-        look.current.lerp(new THREE.Vector3(0, 1.7, 0), k * 0.2);
+        if (contentLook) {
+          look.current.lerp(
+            new THREE.Vector3(...contentLook),
+            k * 0.15
+          );
+        }
+        pos.current.y += Math.sin(now * 0.0008) * 0.002;
         break;
       }
     }

@@ -4,13 +4,15 @@ import { useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Sparkles } from "@react-three/drei";
 import * as THREE from "three";
-import { PORTALS, PORTAL_COMMANDS } from "../data";
+import { PORTALS, PORTAL_COMMANDS, ZONES } from "../data";
 import { useGame, type PortalId } from "../store";
 import { sound } from "../sound";
+import ZoneTag from "./ZoneTag";
 
 function Portal({ id }: { id: PortalId }) {
   const def = PORTALS.find((p) => p.id === id)!;
-  const color = id === "membership" ? "#f59e0b" : "#4a9eff";
+  const zone = ZONES[id];
+  const color = zone.accent;
   const openPortal = useGame((s) => s.openPortal);
   const setCursor = useGame((s) => s.setCursor);
   const [hovered, setHovered] = useState(false);
@@ -22,40 +24,24 @@ function Portal({ id }: { id: PortalId }) {
     const t = clock.elapsedTime;
     if (group.current) {
       const target = hovered ? 1.18 : 1;
-      group.current.scale.lerp(
-        new THREE.Vector3(target, target, target),
-        0.12
-      );
-      group.current.position.y = def.position[1] + Math.sin(t * 1.4 + def.position[0]) * 0.06;
+      group.current.scale.lerp(new THREE.Vector3(target, target, target), 0.12);
+      group.current.position.y = def.position[1] + Math.sin(t * 1.4 + def.position[0]) * 0.05;
     }
     if (ring.current) {
       ring.current.rotation.z = t * 0.35;
       (ring.current.material as THREE.MeshStandardMaterial).emissiveIntensity =
-        1.4 + (hovered ? 1.3 : 0.4) + Math.sin(t * 3 + def.position[0]) * 0.3;
+        1.5 + (hovered ? 1.3 : 0.4) + Math.sin(t * 3 + def.position[0]) * 0.3;
     }
     if (inner.current) {
       inner.current.rotation.z = -t * 0.5;
       (inner.current.material as THREE.MeshStandardMaterial).emissiveIntensity =
-        1.1 + (hovered ? 1.4 : 0.5) + Math.sin(t * 2.4) * 0.4;
+        1.2 + (hovered ? 1.4 : 0.5) + Math.sin(t * 2.4) * 0.4;
     }
   });
 
-  const activate = () => {
-    sound.whoosh();
-    const p = def.position;
-    const dir = new THREE.Vector3(...p).normalize();
-    const to: [number, number, number] = [
-      p[0] - dir.x * 2.4,
-      1.7,
-      p[2] - dir.z * 2.4,
-    ];
-    const look: [number, number, number] = [p[0], 1.7, p[2]];
-    openPortal(id, { to, look });
-  };
-
   return (
     <group position={def.position}>
-      <group ref={group}>
+      <group ref={group} rotation={[0, def.rotY ?? 0, 0]}>
         <mesh
           ref={ring}
           castShadow
@@ -64,7 +50,7 @@ function Portal({ id }: { id: PortalId }) {
             setHovered(true);
             setCursor({
               label: PORTAL_COMMANDS[id] ?? "ENTER",
-              sub: `${def.name} · ${def.tagline}`,
+              sub: `${def.name} · ${zone.blurb}`,
             });
             sound.hover();
           }}
@@ -74,10 +60,11 @@ function Portal({ id }: { id: PortalId }) {
           }}
           onClick={(e) => {
             e.stopPropagation();
-            activate();
+            sound.whoosh();
+            openPortal(id, zone.anchor);
           }}
         >
-          <torusGeometry args={[1.1, 0.1, 12, 48]} />
+          <torusGeometry args={[1.05, 0.1, 12, 48]} />
           <meshStandardMaterial
             color={color}
             emissive={color}
@@ -88,7 +75,7 @@ function Portal({ id }: { id: PortalId }) {
           />
         </mesh>
         <mesh ref={inner}>
-          <circleGeometry args={[0.95, 40]} />
+          <circleGeometry args={[0.92, 40]} />
           <meshStandardMaterial
             color="#060810"
             emissive={color}
@@ -100,7 +87,7 @@ function Portal({ id }: { id: PortalId }) {
           />
         </mesh>
         <mesh position={[0, 0, -0.12]}>
-          <cylinderGeometry args={[0.9, 0.9, 0.6, 32, 1, true]} />
+          <cylinderGeometry args={[0.85, 0.85, 0.6, 32, 1, true]} />
           <meshBasicMaterial
             color={color}
             transparent
@@ -110,10 +97,29 @@ function Portal({ id }: { id: PortalId }) {
             blending={THREE.AdditiveBlending}
           />
         </mesh>
+        <mesh position={[0, 1.15, 0]}>
+          <boxGeometry args={[1.9, 0.14, 0.2]} />
+          <meshStandardMaterial {...doorSteel} />
+        </mesh>
+        <mesh position={[-1.05, 0, 0]}>
+          <boxGeometry args={[0.16, 3.3, 0.18]} />
+          <meshStandardMaterial {...doorSteel} />
+        </mesh>
+        <mesh position={[1.05, 0, 0]}>
+          <boxGeometry args={[0.16, 3.3, 0.18]} />
+          <meshStandardMaterial {...doorSteel} />
+        </mesh>
+        <ZoneTag
+          text={def.name}
+          color={color}
+          width={1.7}
+          height={0.3}
+          position={[0, 2.8, 0]}
+        />
         <Sparkles
           count={12}
-          scale={[1.4, 1.4, 1.4]}
-          size={2.2}
+          scale={[1.3, 1.3, 1.3]}
+          size={2.4}
           speed={0.5}
           opacity={0.55}
           color={color}
@@ -122,6 +128,8 @@ function Portal({ id }: { id: PortalId }) {
     </group>
   );
 }
+
+const doorSteel = { color: "#2b2d33", metalness: 0.8, roughness: 0.4 };
 
 export default function Portals() {
   return (

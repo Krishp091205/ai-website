@@ -53,10 +53,14 @@ export default function PortalContent() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.7 }}
-          className="fixed inset-0 z-[52] overflow-y-auto bg-black/78 backdrop-blur-sm"
+          className="fixed inset-0 z-[52] overflow-y-auto"
+          style={{
+            background:
+              "radial-gradient(90% 85% at 50% 42%, rgba(5,5,8,0.82) 0%, rgba(5,5,8,0.55) 55%, rgba(5,5,8,0.3) 100%)",
+          }}
         >
-          <div className="pointer-events-none fixed inset-x-0 top-0 h-[9vh] bg-black" />
-          <div className="pointer-events-none fixed inset-x-0 bottom-0 h-[9vh] bg-black" />
+          <div className="pointer-events-none fixed inset-x-0 top-0 h-[9vh] bg-black/85" />
+          <div className="pointer-events-none fixed inset-x-0 bottom-0 h-[9vh] bg-black/85" />
 
           <div className="mx-auto flex min-h-screen w-full max-w-5xl flex-col justify-center px-6 py-24">
             <motion.div

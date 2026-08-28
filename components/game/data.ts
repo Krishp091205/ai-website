@@ -37,6 +37,7 @@ export interface PortalDef {
   tagline: string;
   position: [number, number, number];
   command: string;
+  rotY?: number;
 }
 
 export const PORTAL_COMMANDS: Record<string, string> = {
@@ -49,13 +50,57 @@ export const PORTAL_COMMANDS: Record<string, string> = {
 };
 
 export const PORTALS: PortalDef[] = [
-  { id: "about", name: "ABOUT", tagline: "History wall", position: [4.2, 1.7, -6], command: "ENTER" },
-  { id: "programs", name: "PROGRAMS", tagline: "Training zone", position: [8.5, 1.7, -3.2], command: "SELECT" },
-  { id: "facility", name: "FACILITY", tagline: "Multi-zone tour", position: [8.5, 1.7, 3.2], command: "ENTER" },
-  { id: "membership", name: "MEMBERSHIP", tagline: "VIP lounge", position: [4.2, 1.7, 6], command: "ENTER" },
-  { id: "contact", name: "CONTACT", tagline: "Front desk", position: [-4.2, 1.7, 6], command: "READ" },
-  { id: "trainers", name: "TRAINERS", tagline: "Coaching center", position: [-8.5, 1.7, 3.2], command: "VIEW" },
+  { id: "about", name: "ABOUT", tagline: "History wall", position: [4.5, 1.7, -10.7], command: "ENTER", rotY: 0 },
+  { id: "programs", name: "PROGRAMS", tagline: "Training zone", position: [11.1, 1.7, -2.5], command: "SELECT", rotY: 1.57 },
+  { id: "facility", name: "FACILITY", tagline: "Multi-zone tour", position: [-11.1, 1.7, -5], command: "ENTER", rotY: -1.57 },
+  { id: "membership", name: "MEMBERSHIP", tagline: "VIP lounge", position: [11.9, 1.7, 6.9], command: "ENTER", rotY: 0 },
+  { id: "contact", name: "CONTACT", tagline: "Front desk", position: [-11.1, 1.7, 3.5], command: "READ", rotY: -1.57 },
+  { id: "trainers", name: "TRAINERS", tagline: "Coaching center", position: [11.1, 1.7, 3.3], command: "VIEW", rotY: 1.57 },
 ];
+
+export interface ZoneAnchor {
+  to: [number, number, number];
+  look: [number, number, number];
+}
+
+export const ZONES: Record<PortalId, { name: string; accent: string; blurb: string; anchor: ZoneAnchor }> = {
+  about: {
+    name: "ABOUT",
+    accent: "#4a9eff",
+    blurb: "We built a stadium for human effort.",
+    anchor: { to: [1, 2, -15.6], look: [4, 1.6, -14.2] },
+  },
+  programs: {
+    name: "PROGRAMS",
+    accent: "#4a9eff",
+    blurb: "Every program is a mission. Pick yours.",
+    anchor: { to: [16, 2, -3.8], look: [13.5, 1.6, -2.5] },
+  },
+  trainers: {
+    name: "TRAINERS",
+    accent: "#9dbaff",
+    blurb: "Coaches who compete, not sell.",
+    anchor: { to: [15.6, 2, 4.6], look: [13.5, 1.6, 3.4] },
+  },
+  facility: {
+    name: "FACILITY",
+    accent: "#4a9eff",
+    blurb: "Six zones. One arena.",
+    anchor: { to: [-15.6, 2, -6], look: [-13.5, 1.6, -5] },
+  },
+  membership: {
+    name: "MEMBERSHIP",
+    accent: "#f59e0b",
+    blurb: "Where legends rest between sets.",
+    anchor: { to: [14, 2, 12.2], look: [13, 1.6, 10.2] },
+  },
+  contact: {
+    name: "CONTACT",
+    accent: "#4a9eff",
+    blurb: "Talk to a human. We have those.",
+    anchor: { to: [-15.6, 2, 4.6], look: [-13.5, 1.6, 3.5] },
+  },
+};
 
 export interface Program {
   id: string;
