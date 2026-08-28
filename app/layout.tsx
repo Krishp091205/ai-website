@@ -39,12 +39,21 @@ export const metadata: Metadata = {
     description:
       "A cinematic 3D gym experience. Explore the arena, choose your training mission, and start the grind.",
     url: "https://krishp091205.github.io/ai-website",
+    images: [
+      {
+        url: "https://krishp091205.github.io/ai-website/img/about.jpg",
+        width: 1400,
+        height: 900,
+        alt: "GYMVERSE training arena",
+      },
+    ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "GYMVERSE — Enter the Grind",
     description:
       "A cinematic 3D gym experience. Explore the arena, choose your training mission, and start the grind.",
+    images: ["https://krishp091205.github.io/ai-website/img/about.jpg"],
   },
 };
 

@@ -121,11 +121,66 @@ function Stagger({ children, delay = 0 }: { children: React.ReactNode; delay?: n
   );
 }
 
+function Feed({
+  src,
+  alt,
+  label,
+  aspect = "aspect-[16/9]",
+  className = "",
+}: {
+  src: string;
+  alt: string;
+  label?: string;
+  aspect?: string;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`group relative overflow-hidden rounded-sm border border-line/70 ${aspect} ${className}`}
+    >
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        decoding="async"
+        className="absolute inset-0 h-full w-full object-cover saturate-[0.8] contrast-[1.06] transition-all duration-700 group-hover:saturate-100"
+      />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/15" />
+      <div
+        className="pointer-events-none absolute inset-0 opacity-50"
+        style={{
+          background:
+            "repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0 1px, transparent 1px 3px)",
+        }}
+      />
+      {label && (
+        <span className="absolute left-3 top-3 rounded-sm border border-white/10 bg-black/60 px-2 py-1 text-[9px] tracking-[0.26em] text-white/80 backdrop-blur-sm">
+          {label}
+        </span>
+      )}
+      <span className="pointer-events-none absolute left-2 top-2 h-3 w-3 border-l border-t border-accent/70" />
+      <span className="pointer-events-none absolute right-2 top-2 h-3 w-3 border-r border-t border-accent/70" />
+      <span className="pointer-events-none absolute bottom-2 left-2 h-3 w-3 border-b border-l border-accent/70" />
+      <span className="pointer-events-none absolute bottom-2 right-2 h-3 w-3 border-b border-r border-accent/70" />
+    </div>
+  );
+}
+
 function renderSection(id: string) {
   switch (id) {
     case "about":
       return (
-        <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr]">
+        <>
+          <Stagger>
+            <Feed
+              src={ABOUT_COPY.image}
+              alt="GYMVERSE training arena"
+              label="THE ARENA · LIVE FEED"
+              aspect="aspect-[16/7]"
+              className="mb-10"
+            />
+          </Stagger>
+          <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr]">
           <Stagger>
             <p
               className="font-display text-xl tracking-[0.12em] text-accent text-glow sm:text-2xl"
@@ -156,6 +211,7 @@ function renderSection(id: string) {
             </div>
           </Stagger>
         </div>
+        </>
       );
 
     case "programs":
@@ -169,14 +225,19 @@ function renderSection(id: string) {
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {FACILITY_ZONES.map((z, i) => (
             <Stagger key={z.name} delay={i * 0.1}>
-              <div className="hud-panel h-full rounded-sm p-5 transition-colors hover:border-accent/40">
-                <div className="text-[9px] tracking-[0.3em] text-accent">
-                  0{i + 1}
+              <div className="hud-panel h-full rounded-sm p-3 transition-colors hover:border-accent/40">
+                <Feed
+                  src={z.image}
+                  alt={`${z.name} zone`}
+                  label={`ZONE 0${i + 1}`}
+                  aspect="aspect-[16/9]"
+                />
+                <div className="p-4">
+                  <h3 className="font-display text-lg tracking-[0.16em] text-white">
+                    {z.name}
+                  </h3>
+                  <p className="mt-2 text-sm leading-6 text-white/65">{z.description}</p>
                 </div>
-                <h3 className="mt-2 font-display text-lg tracking-[0.16em] text-white">
-                  {z.name}
-                </h3>
-                <p className="mt-2 text-sm leading-6 text-white/65">{z.description}</p>
               </div>
             </Stagger>
           ))}
@@ -189,16 +250,23 @@ function renderSection(id: string) {
           {MEMBERSHIP.map((tier, i) => (
             <Stagger key={tier.id} delay={i * 0.12}>
               <div
-                className={`hud-panel relative flex h-full flex-col rounded-sm p-7 transition-colors hover:border-accent/40 ${
+                className={`hud-panel relative flex h-full flex-col rounded-sm p-3 transition-colors hover:border-accent/40 ${
                   tier.featured ? "border-accent/50" : ""
                 }`}
               >
+                <Feed
+                  src={tier.image}
+                  alt={`${tier.name} membership tier`}
+                  label={tier.name}
+                  aspect="aspect-[21/10]"
+                />
+                <div className="flex h-full flex-col p-4">
                 {tier.featured && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-sm bg-accent px-4 py-1 text-[9px] font-bold tracking-[0.28em] text-black">
+                  <div className="absolute top-1 left-1/2 -translate-x-1/2 rounded-sm bg-accent px-4 py-1 text-[9px] font-bold tracking-[0.28em] text-black">
                     MOST CHOSEN
                   </div>
                 )}
-                <h3 className="font-display text-3xl tracking-[0.2em] text-white">
+                <h3 className="mt-3 font-display text-3xl tracking-[0.2em] text-white">
                   {tier.name}
                 </h3>
                 <p className="mt-1 text-[10px] tracking-[0.22em] text-muted">
@@ -221,6 +289,7 @@ function renderSection(id: string) {
                 >
                   ENROLL — {tier.name}
                 </button>
+                </div>
               </div>
             </Stagger>
           ))}
@@ -248,10 +317,17 @@ function ProgramsBody() {
       {PROGRAMS.map((p, i) => (
         <Stagger key={p.id} delay={i * 0.08}>
           <div
-            className={`hud-panel flex h-full flex-col rounded-sm p-6 transition-colors hover:border-accent/40 ${
+            className={`hud-panel flex h-full flex-col rounded-sm p-3 transition-colors hover:border-accent/40 ${
               accepted.includes(p.id) ? "border-emerald-400/50" : ""
             }`}
           >
+            <Feed
+              src={p.image}
+              alt={`${p.title} training mission`}
+              label="LIVE FEED"
+              aspect="aspect-[16/9]"
+            />
+            <div className="flex h-full flex-col p-3">
             <div className="flex items-center justify-between">
               <span className="text-[9px] tracking-[0.3em] text-accent">
                 {p.title.split("—")[0].trim()}
@@ -314,6 +390,7 @@ function ProgramsBody() {
             >
               {accepted.includes(p.id) ? "MISSION ACTIVE ✓" : "[ ACCEPT MISSION ]"}
             </button>
+            </div>
           </div>
         </Stagger>
       ))}
@@ -347,16 +424,15 @@ function TrainersBody() {
         <div className="grid gap-4 md:grid-cols-3">
           {TRAINERS.map((t, i) => (
             <Stagger key={t.id} delay={i * 0.12}>
-              <div className="hud-panel group flex h-full flex-col rounded-sm p-6 transition-colors hover:border-accent/40">
-                <div className="flex items-center justify-between">
-                  <span className="flex h-12 w-12 items-center justify-center rounded-sm bg-gradient-to-br from-accent/30 to-transparent font-display text-lg text-white">
-                    {t.name[0]}
-                  </span>
-                  <span className="text-[10px] tracking-[0.24em] text-accent">
-                    Lv.{t.level}
-                  </span>
-                </div>
-                <h3 className="mt-5 font-display text-xl tracking-[0.14em] text-white">
+              <div className="hud-panel group flex h-full flex-col rounded-sm p-3 transition-colors hover:border-accent/40">
+                <Feed
+                  src={t.image}
+                  alt={`${t.name} — ${t.title}`}
+                  label={`LVL ${t.level}`}
+                  aspect="aspect-[4/5]"
+                />
+                <div className="flex h-full flex-col p-3">
+                <h3 className="font-display text-xl tracking-[0.14em] text-white">
                   {t.name}
                 </h3>
                 <div className="mt-1 text-[10px] tracking-[0.22em] text-warm">
@@ -375,6 +451,7 @@ function TrainersBody() {
                 >
                   VIEW FILE
                 </button>
+                </div>
               </div>
             </Stagger>
           ))}
@@ -405,9 +482,12 @@ function TrainerDetail({
     >
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-center gap-5">
-          <span className="flex h-20 w-20 items-center justify-center rounded-sm bg-gradient-to-br from-accent/35 to-transparent font-display text-3xl text-white">
-            {t.name[0]}
-          </span>
+          <Feed
+            src={t.image}
+            alt={`${t.name} — ${t.title}`}
+            aspect="aspect-square"
+            className="h-24 w-24 shrink-0"
+          />
           <div>
             <h3 className="font-display text-3xl tracking-[0.14em] text-white">
               {t.name}

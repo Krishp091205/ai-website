@@ -1,5 +1,7 @@
 import type { PortalId } from "./store";
 
+const IMG = "/ai-website/img/";
+
 export interface GameProfile {
   player: string;
   level: number;
@@ -111,6 +113,7 @@ export interface Program {
   duration: string;
   description: string;
   focus: string[];
+  image: string;
 }
 
 export const PROGRAMS: Program[] = [
@@ -124,6 +127,7 @@ export const PROGRAMS: Program[] = [
     description:
       "A progressive overload system built around the big lifts. Squat, bench, deadlift, and overhead press programmed across four training blocks with deload weeks engineered in.",
     focus: ["Squat", "Bench", "Deadlift", "Press"],
+    image: `${IMG}program-strength.jpg`,
   },
   {
     id: "hypertrophy",
@@ -135,6 +139,7 @@ export const PROGRAMS: Program[] = [
     description:
       "High-volume bodybuilding splits targeting every head of every muscle. Supersets, drop sets, and tempo work to maximize mechanical tension and metabolic stress.",
     focus: ["Chest", "Back", "Legs", "Arms"],
+    image: `${IMG}program-hypertrophy.jpg`,
   },
   {
     id: "conditioning",
@@ -146,6 +151,7 @@ export const PROGRAMS: Program[] = [
     description:
       "Monostructural and strongman-style conditioning. Intervals, circuits, and sled work that build work capacity without sacrificing strength output.",
     focus: ["Rowing", "Prowler", "Intervals", "Core"],
+    image: `${IMG}program-conditioning.jpg`,
   },
   {
     id: "mobility",
@@ -157,6 +163,7 @@ export const PROGRAMS: Program[] = [
     description:
       "Daily mobility and recovery protocol. Soft tissue work, controlled articular rotations, and loaded carries that unwind the modern desk-bound posture.",
     focus: ["Hips", "Thoracic", "Ankles", "Carries"],
+    image: `${IMG}program-mobility.jpg`,
   },
   {
     id: "performance",
@@ -168,6 +175,7 @@ export const PROGRAMS: Program[] = [
     description:
       "Olympic-style lifts, plyometrics, and sprint work. Built for athletes who need to convert strength into speed and jump into a different atmosphere.",
     focus: ["Clean", "Snatch", "Plyo", "Sprint"],
+    image: `${IMG}program-performance.jpg`,
   },
 ];
 
@@ -179,6 +187,7 @@ export interface Trainer {
   specialization: string;
   bio: string;
   skills: { label: string; value: number }[];
+  image: string;
 }
 
 export const TRAINERS: Trainer[] = [
@@ -195,6 +204,7 @@ export const TRAINERS: Trainer[] = [
       { label: "OLY LIFTING", value: 91 },
       { label: "MOBILITY", value: 62 },
     ],
+    image: `${IMG}marcus.jpg`,
   },
   {
     id: "lenna",
@@ -209,6 +219,7 @@ export const TRAINERS: Trainer[] = [
       { label: "HYPERTROPHY", value: 88 },
       { label: "STRENGTH", value: 74 },
     ],
+    image: `${IMG}lenna.jpg`,
   },
   {
     id: "deon",
@@ -223,6 +234,7 @@ export const TRAINERS: Trainer[] = [
       { label: "BREATHING", value: 90 },
       { label: "STRENGTH", value: 58 },
     ],
+    image: `${IMG}deon.jpg`,
   },
 ];
 
@@ -233,6 +245,7 @@ export interface MembershipTier {
   price: string;
   perks: string[];
   featured?: boolean;
+  image: string;
 }
 
 export const MEMBERSHIP: MembershipTier[] = [
@@ -247,6 +260,7 @@ export const MEMBERSHIP: MembershipTier[] = [
       "Standard locker access",
       "Progress app tracking",
     ],
+    image: `${IMG}tier-iron.jpg`,
   },
   {
     id: "titan",
@@ -261,6 +275,7 @@ export const MEMBERSHIP: MembershipTier[] = [
       "Hydromassage & compression",
     ],
     featured: true,
+    image: `${IMG}tier-titan.jpg`,
   },
   {
     id: "legend",
@@ -275,43 +290,52 @@ export const MEMBERSHIP: MembershipTier[] = [
       "Guest passes · 4/mo",
       "Private VIP lounge",
     ],
+    image: `${IMG}tier-legend.jpg`,
   },
 ];
 
 export interface FacilityZone {
   name: string;
   description: string;
+  image: string;
 }
 
 export const FACILITY_ZONES: FacilityZone[] = [
   {
     name: "FREE WEIGHT FLOOR",
     description: "12 platforms, 8 squat racks, calibrated competition plates, and a deadlift stage with precision floor matting.",
+    image: `${IMG}zone-free-weights.jpg`,
   },
   {
     name: "CARDIO ZONE",
     description: "Treadmills, assault bikes, rowers, and ski ergs with individual media screens and heart-rate bridging.",
+    image: `${IMG}zone-cardio.jpg`,
   },
   {
     name: "FUNCTIONAL ZONE",
     description: "Kettlebells to 48kg, battle ropes, TRX rig, sleds, and an agility turf for movement work.",
+    image: `${IMG}zone-functional.jpg`,
   },
   {
     name: "STRONGMAN PIT",
     description: "Yoke, log, atlas stones, farmer's handles, and a sandbag platform for serious conditioning.",
+    image: `${IMG}zone-strongman.jpg`,
   },
   {
     name: "RECOVERY LOUNGE",
     description: "Sauna, steam, cold plunge, compression boots, and guided stretching mats with low lighting.",
+    image: `${IMG}zone-recovery.jpg`,
   },
   {
     name: "ATHLETIC TURF",
     description: "40m sprint lanes, hurdles, plyo boxes, and a sled track for speed and explosive work.",
+    image: `${IMG}zone-turf.jpg`,
   },
 ];
 
 export const ABOUT_COPY = {
   tagline: "ENTER THE GRIND.",
+  image: `${IMG}about.jpg`,
   body: [
     "GYMVERSE was built on a single conviction: training is not a routine, it is a performance.",
     "Opening our doors in 2019, we refused to build another box of mirrors and cardio desks. Instead we built a stadium for human effort — a 14,000 sq ft arena of calibrated steel, precision flooring, and atmosphere engineered for focus. From the deadlift stage to the recovery lounge, every square foot is designed around one idea: let the work speak.",
