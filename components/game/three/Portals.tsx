@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { memo, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Sparkles } from "@react-three/drei";
 import * as THREE from "three";
@@ -131,7 +131,7 @@ function Portal({ id }: { id: PortalId }) {
 
 const doorSteel = { color: "#2b2d33", metalness: 0.8, roughness: 0.4 };
 
-export default function Portals() {
+export default memo(function Portals() {
   return (
     <group>
       {PORTALS.map((p) => (
@@ -139,4 +139,4 @@ export default function Portals() {
       ))}
     </group>
   );
-}
+});

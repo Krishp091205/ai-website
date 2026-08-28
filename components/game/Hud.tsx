@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { PORTALS, PROFILE, ZONES } from "./data";
 import { useGame, type PortalId } from "./store";
@@ -11,11 +11,25 @@ export default function Hud({ onProfile }: { onProfile: () => void }) {
   const objective = useGame((s) => s.objective);
   const objectiveDone = useGame((s) => s.objectiveDone);
   const soundOn = useGame((s) => s.settings.sound);
+  const cinematics = useGame((s) => s.settings.cinematics);
+  const quality = useGame((s) => s.settings.quality);
+  const hudBrightness = useGame((s) => s.settings.hudBrightness);
   const setSettings = useGame((s) => s.setSettings);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
 
   const visible = cameraMode !== "intro" && cameraMode !== "content";
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape" || !useGame.getState().portalOpen) return;
+      if (!menuOpen && !mapOpen) return;
+      setMenuOpen(false);
+      setMapOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [menuOpen, mapOpen]);
 
   const toggleSound = () => {
     const next = !soundOn;
@@ -44,6 +58,9 @@ export default function Hud({ onProfile }: { onProfile: () => void }) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.6 }}
             className="pointer-events-none fixed inset-0 z-50"
+            style={{
+              filter: `brightness(${(0.55 + hudBrightness * 0.6).toFixed(2)})`,
+            }}
           >
             <div className="absolute left-6 top-5 flex items-center gap-3">
               <span className="hud-panel flex h-9 items-center rounded-sm px-4 text-[11px] font-bold tracking-[0.3em] text-white">
@@ -88,6 +105,7 @@ export default function Hud({ onProfile }: { onProfile: () => void }) {
                   sound.click();
                   setMapOpen(true);
                 }}
+                aria-label="Open world map"
                 className="hud-panel rounded-sm px-4 py-3 text-[11px] font-semibold tracking-[0.24em] text-white/80 transition-colors hover:border-accent/40 hover:text-white"
               >
                 MAP
@@ -95,6 +113,7 @@ export default function Hud({ onProfile }: { onProfile: () => void }) {
               <button
                 data-cursor="SELECT"
                 onClick={onProfile}
+                aria-label="Open player profile"
                 className="hud-panel rounded-sm px-4 py-3 text-[11px] font-semibold tracking-[0.24em] text-white/80 transition-colors hover:border-accent/40 hover:text-white"
               >
                 PROFILE
@@ -105,6 +124,7 @@ export default function Hud({ onProfile }: { onProfile: () => void }) {
                   sound.click();
                   setMenuOpen(true);
                 }}
+                aria-label="Open menu and settings"
                 className="hud-panel rounded-sm px-4 py-3 text-[11px] font-semibold tracking-[0.24em] text-white/80 transition-colors hover:border-accent/40 hover:text-white"
               >
                 MENU
@@ -113,6 +133,7 @@ export default function Hud({ onProfile }: { onProfile: () => void }) {
                 data-cursor="SELECT"
                 onClick={toggleSound}
                 aria-pressed={soundOn}
+                aria-label={soundOn ? "Mute sound" : "Enable sound"}
                 className="hud-panel rounded-sm px-4 py-3 text-[11px] font-semibold tracking-[0.2em] text-white/80 transition-colors hover:border-accent/40 hover:text-white"
               >
                 {soundOn ? "🔊" : "🔇"}
@@ -132,6 +153,9 @@ export default function Hud({ onProfile }: { onProfile: () => void }) {
           >
             {mapOpen && (
               <motion.div
+                role="dialog"
+                aria-modal="true"
+                aria-label="World map"
                 initial={{ scale: 0.94, y: 12, opacity: 0 }}
                 animate={{ scale: 1, y: 0, opacity: 1 }}
                 exit={{ scale: 0.96, y: 10, opacity: 0 }}
@@ -211,14 +235,17 @@ export default function Hud({ onProfile }: { onProfile: () => void }) {
             )}
             {menuOpen && (
               <motion.div
+                role="dialog"
+                aria-modal="true"
+                aria-label="Menu and settings"
                 initial={{ scale: 0.94, y: 12, opacity: 0 }}
                 animate={{ scale: 1, y: 0, opacity: 1 }}
                 exit={{ scale: 0.96, y: 10, opacity: 0 }}
-                className="hud-panel w-[92vw] max-w-md rounded-sm p-8"
+                className="hud-panel w-[92vw] max-w-lg rounded-sm p-8"
               >
                 <div className="flex items-center justify-between">
                   <h2 className="font-display text-2xl tracking-[0.2em] text-white">
-                    SETTINGS
+                    MENU
                   </h2>
                   <button
                     data-cursor="SELECT"
@@ -227,29 +254,72 @@ export default function Hud({ onProfile }: { onProfile: () => void }) {
                       sound.click();
                       setMenuOpen(false);
                     }}
-                    aria-label="Close settings"
+                    aria-label="Close menu"
                   >
                     ESC ✕
                   </button>
                 </div>
+
+                <div className="mt-5 grid grid-cols-2 gap-2 border-b border-line pb-6">
+                  <button
+                    data-cursor="SELECT"
+                    onClick={() => {
+                      sound.click();
+                      setMenuOpen(false);
+                      setMapOpen(true);
+                    }}
+                    className="border border-line px-4 py-3 text-[11px] tracking-[0.26em] text-white/75 transition-colors hover:border-accent/50 hover:text-white"
+                  >
+                    WORLD MAP
+                  </button>
+                  <button
+                    data-cursor="SELECT"
+                    onClick={() => {
+                      sound.click();
+                      setMenuOpen(false);
+                      onProfile();
+                    }}
+                    className="border border-line px-4 py-3 text-[11px] tracking-[0.26em] text-white/75 transition-colors hover:border-accent/50 hover:text-white"
+                  >
+                    PLAYER PROFILE
+                  </button>
+                </div>
+
                 <div className="mt-6 space-y-6">
+                  <Toggle label="SOUND" on={soundOn} onClick={toggleSound} />
                   <Toggle
-                    label="SOUND"
-                    on={soundOn}
-                    onClick={toggleSound}
+                    label="CINEMATIC INTRO"
+                    on={cinematics}
+                    onClick={() => setSettings({ cinematics: !cinematics })}
                   />
                   <Toggle
-                    label="CINEMATICS"
-                    on={useGame.getState().settings.cinematics}
-                    onClick={() =>
-                      useGame
-                        .getState()
-                        .setSettings({ cinematics: !useGame.getState().settings.cinematics })
-                    }
+                    label="HIGH QUALITY (60 FPS)"
+                    on={quality === "high"}
+                    onClick={() => {
+                      const next = quality === "high" ? "low" : "high";
+                      setSettings({ quality: next });
+                      sound.click();
+                    }}
                   />
-                  <div className="flex items-center justify-between text-[11px] tracking-[0.24em] text-white/70">
-                    <span>ANIMATION SPEED</span>
-                    <span className="text-muted">100%</span>
+                  <div>
+                    <div className="flex items-center justify-between text-[11px] tracking-[0.24em] text-white/70">
+                      <span>HUD BRIGHTNESS</span>
+                      <span className="text-accent">
+                        {Math.round(hudBrightness * 100)}%
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min={0.4}
+                      max={1.6}
+                      step={0.1}
+                      value={hudBrightness}
+                      onChange={(e) =>
+                        setSettings({ hudBrightness: Number(e.target.value) })
+                      }
+                      aria-label="HUD brightness"
+                      className="range mt-3 w-full accent-[#4a9eff]"
+                    />
                   </div>
                 </div>
                 <p className="mt-6 text-[10px] tracking-[0.24em] text-muted">

@@ -9,6 +9,7 @@ import {
   MEMBERSHIP,
   PROGRAMS,
   TRAINERS,
+  type Trainer,
 } from "./data";
 import { useGame } from "./store";
 import { sound } from "./sound";
@@ -157,42 +158,7 @@ function renderSection(id: string) {
       return <ProgramsBody />;
 
     case "trainers":
-      return (
-        <div className="grid gap-4 md:grid-cols-3">
-          {TRAINERS.map((t, i) => (
-            <Stagger key={t.id} delay={i * 0.12}>
-              <div className="hud-panel group flex h-full flex-col rounded-sm p-6 transition-colors hover:border-accent/40">
-                <div className="flex items-center justify-between">
-                  <span className="flex h-12 w-12 items-center justify-center rounded-sm bg-gradient-to-br from-accent/30 to-transparent font-display text-lg text-white">
-                    {t.name[0]}
-                  </span>
-                  <span className="text-[10px] tracking-[0.24em] text-accent">
-                    Lv.{t.level}
-                  </span>
-                </div>
-                <h3 className="mt-5 font-display text-xl tracking-[0.14em] text-white">
-                  {t.name}
-                </h3>
-                <div className="mt-1 text-[10px] tracking-[0.22em] text-warm">
-                  {t.title}
-                </div>
-                <p className="mt-3 flex-1 text-sm leading-6 text-white/70">
-                  {t.bio}
-                </p>
-                <div className="mt-4 text-[10px] tracking-[0.18em] text-muted">
-                  {t.specialization}
-                </div>
-                <button
-                  data-cursor="SELECT"
-                  className="mt-5 rounded-sm border border-line py-2.5 text-[10px] tracking-[0.28em] text-white/70 transition-all hover:border-accent hover:text-white"
-                >
-                  BOOK SESSION
-                </button>
-              </div>
-            </Stagger>
-          ))}
-        </div>
-      );
+      return <TrainersBody />;
 
     case "facility":
       return (
@@ -348,6 +314,165 @@ function ProgramsBody() {
         </Stagger>
       ))}
     </div>
+  );
+}
+
+function TrainersBody() {
+  const [selected, setSelected] = useState<Trainer | null>(null);
+  const [booked, setBooked] = useState<string | null>(null);
+
+  const open = (t: Trainer) => {
+    sound.click();
+    setSelected(t);
+    setBooked(null);
+  };
+
+  return (
+    <>
+      {selected ? (
+        <TrainerDetail
+          trainer={selected}
+          booked={booked === selected.id}
+          onBack={() => setSelected(null)}
+          onBook={() => {
+            sound.whoosh();
+            setBooked(selected.id);
+          }}
+        />
+      ) : (
+        <div className="grid gap-4 md:grid-cols-3">
+          {TRAINERS.map((t, i) => (
+            <Stagger key={t.id} delay={i * 0.12}>
+              <div className="hud-panel group flex h-full flex-col rounded-sm p-6 transition-colors hover:border-accent/40">
+                <div className="flex items-center justify-between">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-sm bg-gradient-to-br from-accent/30 to-transparent font-display text-lg text-white">
+                    {t.name[0]}
+                  </span>
+                  <span className="text-[10px] tracking-[0.24em] text-accent">
+                    Lv.{t.level}
+                  </span>
+                </div>
+                <h3 className="mt-5 font-display text-xl tracking-[0.14em] text-white">
+                  {t.name}
+                </h3>
+                <div className="mt-1 text-[10px] tracking-[0.22em] text-warm">
+                  {t.title}
+                </div>
+                <p className="mt-3 line-clamp-4 flex-1 text-sm leading-6 text-white/70">
+                  {t.bio}
+                </p>
+                <div className="mt-4 text-[10px] tracking-[0.18em] text-muted">
+                  {t.specialization}
+                </div>
+                <button
+                  data-cursor="VIEW"
+                  onClick={() => open(t)}
+                  className="mt-5 rounded-sm border border-line py-2.5 text-[10px] tracking-[0.28em] text-white/70 transition-all hover:border-accent hover:text-white"
+                >
+                  VIEW FILE
+                </button>
+              </div>
+            </Stagger>
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
+
+function TrainerDetail({
+  trainer,
+  booked,
+  onBack,
+  onBook,
+}: {
+  trainer: Trainer;
+  booked: boolean;
+  onBack: () => void;
+  onBook: () => void;
+}) {
+  const t = trainer;
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.55, ease: "easeOut" }}
+      className="hud-panel mx-auto max-w-3xl rounded-sm p-6 sm:p-10"
+    >
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="flex items-center gap-5">
+          <span className="flex h-20 w-20 items-center justify-center rounded-sm bg-gradient-to-br from-accent/35 to-transparent font-display text-3xl text-white">
+            {t.name[0]}
+          </span>
+          <div>
+            <h3 className="font-display text-3xl tracking-[0.14em] text-white">
+              {t.name}
+            </h3>
+            <div className="mt-1 text-[10px] tracking-[0.22em] text-warm">
+              {t.title}
+            </div>
+          </div>
+        </div>
+        <div className="text-right">
+          <div className="font-display text-3xl text-accent text-glow">
+            {t.level}
+          </div>
+          <div className="text-[9px] tracking-[0.3em] text-muted">LVL</div>
+        </div>
+      </div>
+
+      <div className="mt-6 border-t border-line pt-6 text-sm leading-7 text-white/75">
+        {t.bio}
+      </div>
+
+      <div className="mt-6 grid gap-x-8 gap-y-4 sm:grid-cols-2">
+        {t.skills.map((s, i) => (
+          <div key={s.label}>
+            <div className="flex justify-between text-[10px] tracking-[0.24em] text-white/75">
+              <span>{s.label}</span>
+              <span className="text-white">{s.value}</span>
+            </div>
+            <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-white/8">
+              <motion.div
+                className="h-full rounded-full bg-accent"
+                style={{ boxShadow: "0 0 10px rgba(74,158,255,0.6)" }}
+                initial={{ width: "0%" }}
+                animate={{ width: `${s.value}%` }}
+                transition={{ delay: 0.2 + i * 0.12, duration: 0.9, ease: "easeOut" }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-6 flex flex-wrap items-center gap-3">
+        <span className="text-[10px] tracking-[0.24em] text-muted">
+          FOCUS · {t.specialization}
+        </span>
+        <div className="ml-auto flex gap-3">
+          <button
+            data-cursor="RETURN"
+            onClick={onBack}
+            className="rounded-sm border border-line px-6 py-3 text-[11px] tracking-[0.28em] text-white/70 transition-all hover:border-white/40 hover:text-white"
+          >
+            ← BACK
+          </button>
+          {booked ? (
+            <div className="rounded-sm border border-emerald-400/60 px-6 py-3 text-[11px] tracking-[0.28em] text-emerald-300">
+              SESSION BOOKED ✓
+            </div>
+          ) : (
+            <button
+              data-cursor="SELECT"
+              onClick={onBook}
+              className="rounded-sm bg-accent px-6 py-3 text-[11px] font-semibold tracking-[0.28em] text-black transition-colors hover:bg-white"
+            >
+              BOOK SESSION
+            </button>
+          )}
+        </div>
+      </div>
+    </motion.div>
   );
 }
 

@@ -43,8 +43,8 @@ function FlickerLight({
 
 export default function GameScene() {
   const quality = useGame((s) => s.settings.quality);
-  const high = quality === "high";
-  const bloom = high && !IS_MOBILE;
+  const high = quality === "high" && !IS_MOBILE;
+  const bloom = high;
 
   return (
     <Canvas
@@ -60,7 +60,7 @@ export default function GameScene() {
       <CameraRig />
       <GymHub reduced={!high} />
       <Portals />
-      <ZoneEnvironments />
+      <ZoneEnvironments reduced={!high} />
 
       <ambientLight intensity={high ? 0.3 : 0.5} />
       <hemisphereLight

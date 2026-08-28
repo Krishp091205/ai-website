@@ -178,6 +178,7 @@ export interface Trainer {
   level: number;
   specialization: string;
   bio: string;
+  skills: { label: string; value: number }[];
 }
 
 export const TRAINERS: Trainer[] = [
@@ -188,6 +189,12 @@ export const TRAINERS: Trainer[] = [
     level: 99,
     specialization: "Powerlifting · Olympic lifting · Programming",
     bio: "Former national powerlifting champion with 14 years on the platform. Marcus has coached 200+ lifters to state and national records. His methodology is brutal in its simplicity: master the lift, progress the load, respect the process.",
+    skills: [
+      { label: "STRENGTH", value: 98 },
+      { label: "PROGRAMMING", value: 95 },
+      { label: "OLY LIFTING", value: 91 },
+      { label: "MOBILITY", value: 62 },
+    ],
   },
   {
     id: "lenna",
@@ -196,6 +203,12 @@ export const TRAINERS: Trainer[] = [
     level: 84,
     specialization: "HIIT · Hypertrophy · Athletic conditioning",
     bio: "A competitive CrossFit athlete turned coach, Lenna designs sessions that feel like boss fights. Expect circuits that combine strength, speed, and endurance until the last minute of the last round.",
+    skills: [
+      { label: "CONDITIONING", value: 96 },
+      { label: "HIIT", value: 94 },
+      { label: "HYPERTROPHY", value: 88 },
+      { label: "STRENGTH", value: 74 },
+    ],
   },
   {
     id: "deon",
@@ -204,6 +217,12 @@ export const TRAINERS: Trainer[] = [
     level: 71,
     specialization: "Mobility · Injury prevention · Breathing",
     bio: "Deon spent a decade in professional football before an injury rewired his career. He lives in the spaces most people skip: ankles, hips, thoracic spine, and the breath that runs it all.",
+    skills: [
+      { label: "MOBILITY", value: 97 },
+      { label: "RECOVERY", value: 95 },
+      { label: "BREATHING", value: 90 },
+      { label: "STRENGTH", value: 58 },
+    ],
   },
 ];
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef } from "react";
+import { memo, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Instance, Instances, Sparkles } from "@react-three/drei";
 import * as THREE from "three";
@@ -404,7 +404,7 @@ function Athlete({
   );
 }
 
-export default function GymHub({ reduced }: { reduced: boolean }) {
+export default memo(function GymHub({ reduced }: { reduced: boolean }) {
   const wall = (p: [number, number, number], s: [number, number, number]) => (
     <mesh key={p.join(",")} position={p} receiveShadow>
       <boxGeometry args={s} />
@@ -466,4 +466,4 @@ export default function GymHub({ reduced }: { reduced: boolean }) {
       <Athlete position={[-4.6, 0, -5]} pose="curls" color="#23262c" />
     </group>
   );
-}
+});

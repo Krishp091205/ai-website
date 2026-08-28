@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { memo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Sparkles } from "@react-three/drei";
 import * as THREE from "three";
@@ -115,7 +115,7 @@ function LintelStrip({ position, accent, length = 2.6 }: { position: [number, nu
   );
 }
 
-function AboutZone() {
+function AboutZone({ reduced }: { reduced?: boolean }) {
   return (
     <group>
       <Room cx={3.5} cz={-15.25} hx={4.75} hz={2.75} open={{ side: "z+", from: 3, to: 5.8 }} accent="#4a9eff" />
@@ -146,12 +146,12 @@ function AboutZone() {
       </mesh>
       <LintelStrip position={[4.5, 2.5, -12.45]} accent="#4a9eff" />
       <ZoneTag text="ABOUT" position={[3.5, 2.5, -17] } rotation={[0, 0, 0]} />
-      <Sparkles count={14} scale={[7, 2, 5]} position={[3.5, 1.8, -15.2]} size={2} speed={0.2} opacity={0.3} color="#4a9eff" />
+      <Sparkles count={reduced ? 8 : 14} scale={[7, 2, 5]} position={[3.5, 1.8, -15.2]} size={2} speed={0.2} opacity={0.3} color="#4a9eff" />
     </group>
   );
 }
 
-function ProgramsZone() {
+function ProgramsZone({ reduced }: { reduced?: boolean }) {
   return (
     <group>
       <Room cx={16} cz={-3.75} hx={3} hz={3.25} open={{ side: "x-", from: -4.2, to: -0.8 }} accent="#4a9eff" />
@@ -186,12 +186,12 @@ function ProgramsZone() {
       </mesh>
       <LintelStrip position={[13, 2.5, -2.4]} accent="#4a9eff" />
       <ZoneTag text="PROGRAMS" position={[18.4, 2.55, -3.6]} rotation={[0, Math.PI / 2, 0]} width={2.4} height={0.44} />
-      <Sparkles count={14} scale={[6, 2, 6]} position={[16, 1.8, -3.75]} size={2} speed={0.2} opacity={0.3} color="#4a9eff" />
+      <Sparkles count={reduced ? 8 : 14} scale={[6, 2, 6]} position={[16, 1.8, -3.75]} size={2} speed={0.2} opacity={0.3} color="#4a9eff" />
     </group>
   );
 }
 
-function TrainersZone() {
+function TrainersZone({ reduced }: { reduced?: boolean }) {
   return (
     <group>
       <Room cx={16} cz={3.75} hx={3} hz={3.25} open={{ side: "x-", from: 1.5, to: 5.2 }} accent="#9dbaff" />
@@ -222,12 +222,12 @@ function TrainersZone() {
       </mesh>
       <LintelStrip position={[13, 2.5, 3.3]} accent="#9dbaff" length={3} />
       <ZoneTag text="TRAINERS" position={[15.6, 2.75, 6.25]} width={2.8} height={0.52} color="#9dbaff" />
-      <Sparkles count={12} scale={[6, 2, 6]} position={[16, 1.8, 3.75]} size={2} speed={0.25} opacity={0.3} color="#9dbaff" />
+      <Sparkles count={reduced ? 8 : 12} scale={[6, 2, 6]} position={[16, 1.8, 3.75]} size={2} speed={0.25} opacity={0.3} color="#9dbaff" />
     </group>
   );
 }
 
-function FacilityZone() {
+function FacilityZone({ reduced }: { reduced?: boolean }) {
   return (
     <group>
       <Room cx={-16} cz={-4.25} hx={3} hz={3.75} open={{ side: "x+", from: -6.5, to: -3.5 }} accent="#4a9eff" />
@@ -272,12 +272,12 @@ function FacilityZone() {
       ))}
       <LintelStrip position={[-13, 2.5, -5]} accent="#4a9eff" length={2.6} />
       <ZoneTag text="FACILITY" position={[-16, 2.5, -7.9]} width={3} height={0.55} />
-      <Sparkles count={12} scale={[6, 2, 7]} position={[-16, 1.8, -4.25]} size={2} speed={0.2} opacity={0.3} color="#4a9eff" />
+      <Sparkles count={reduced ? 8 : 12} scale={[6, 2, 7]} position={[-16, 1.8, -4.25]} size={2} speed={0.2} opacity={0.3} color="#4a9eff" />
     </group>
   );
 }
 
-function MembershipZone() {
+function MembershipZone({ reduced }: { reduced?: boolean }) {
   return (
     <group>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[12, 0, 7.6]} receiveShadow>
@@ -320,7 +320,7 @@ function MembershipZone() {
       <ZONE_VAULTS />
       <LintelStrip position={[12, 2.6, 8.45]} accent="#f59e0b" length={2.8} />
       <ZoneTag text="VIP LOUNGE" position={[14, 2.6, 14.4]} width={3.6} height={0.6} color="#f59e0b" />
-      <Sparkles count={18} scale={[5, 2.4, 6]} position={[14, 1.9, 11.5]} size={2.4} speed={0.22} opacity={0.4} color="#f5b942" />
+      <Sparkles count={reduced ? 10 : 18} scale={[5, 2.4, 6]} position={[14, 1.9, 11.5]} size={2.4} speed={0.22} opacity={0.4} color="#f5b942" />
     </group>
   );
 }
@@ -338,7 +338,7 @@ function ZONE_VAULTS() {
   );
 }
 
-function ContactZone() {
+function ContactZone({ reduced }: { reduced?: boolean }) {
   return (
     <group>
       <Room cx={-16} cz={3.75} hx={3} hz={3.25} open={{ side: "x+", from: 1.8, to: 5.2 }} accent="#4a9eff" />
@@ -369,20 +369,24 @@ function ContactZone() {
       </mesh>
       <LintelStrip position={[-13, 2.5, 3.5]} accent="#4a9eff" length={2.8} />
       <ZoneTag text="CONTACT" position={[-16, 2.6, 6.9]} width={3.2} height={0.55} />
-      <Sparkles count={12} scale={[6, 2, 6]} position={[-16, 1.8, 3.75]} size={2} speed={0.2} opacity={0.3} color="#4a9eff" />
+      <Sparkles count={reduced ? 8 : 12} scale={[6, 2, 6]} position={[-16, 1.8, 3.75]} size={2} speed={0.2} opacity={0.3} color="#4a9eff" />
     </group>
   );
 }
 
-export default function ZoneEnvironments() {
+export default memo(function ZoneEnvironments({
+  reduced = false,
+}: {
+  reduced?: boolean;
+}) {
   return (
     <group>
-      <AboutZone />
-      <ProgramsZone />
-      <TrainersZone />
-      <FacilityZone />
-      <MembershipZone />
-      <ContactZone />
+      <AboutZone reduced={reduced} />
+      <ProgramsZone reduced={reduced} />
+      <TrainersZone reduced={reduced} />
+      <FacilityZone reduced={reduced} />
+      <MembershipZone reduced={reduced} />
+      <ContactZone reduced={reduced} />
     </group>
   );
-}
+});

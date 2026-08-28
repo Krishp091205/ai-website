@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import { useGame } from "../store";
+import { IS_MOBILE, useGame } from "../store";
 
 const easeInOutCubic = (t: number) =>
   t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
@@ -78,7 +78,7 @@ export default function CameraRig() {
       }
       case "flyIn": {
         if (!flyTarget) break;
-        const dur = 1.5;
+        const dur = IS_MOBILE ? 1.05 : 1.5;
         const p = Math.min(1, t / dur);
         const e = easeInOutCubic(p);
         pos.current.copy(
@@ -90,7 +90,7 @@ export default function CameraRig() {
         break;
       }
       case "flyOut": {
-        const dur = 1.2;
+        const dur = IS_MOBILE ? 0.9 : 1.2;
         const p = Math.min(1, t / dur);
         const e = easeInOutCubic(p);
         pos.current.copy(fromPos.current.clone().lerp(hubPos(), e));
