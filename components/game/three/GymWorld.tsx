@@ -16,8 +16,8 @@ import ZoneTag from "./ZoneTag";
 
 const WALL_H = 3.4;
 
-const WALL = { color: "#17181b", metalness: 0.35, roughness: 0.65 };
-const WALL_TRIM = { color: "#23252a", metalness: 0.5, roughness: 0.5 };
+const WALL = { color: "#252525", metalness: 0.42, roughness: 0.52 };
+const WALL_TRIM = { color: "#181818", metalness: 0.55, roughness: 0.45 };
 
 function Walls() {
   const boxes = useMemo(
@@ -50,7 +50,7 @@ function Floor() {
     <group>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow>
         <planeGeometry args={[76, 64]} />
-        <meshStandardMaterial color="#0b0c0f" metalness={0.3} roughness={0.75} />
+        <meshStandardMaterial color="#151515" metalness={0.2} roughness={0.7} />
       </mesh>
       {/* zone accent floor tiles */}
       {WORLD_ZONES.filter((z) => z.id !== "entry").map((z) => (
@@ -87,11 +87,11 @@ function PathStrips() {
         <group key={i} position={s.pos} rotation={[0, s.rot, 0]}>
           <mesh rotation={[-Math.PI / 2, 0, 0]}>
             <planeGeometry args={[0.55, s.len]} />
-            <meshBasicMaterial color="#4a9eff" transparent opacity={0.5} />
+            <meshBasicMaterial color="#d4af37" transparent opacity={0.5} />
           </mesh>
           <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.002, 0]}>
             <planeGeometry args={[0.8, s.len]} />
-            <meshBasicMaterial color="#4a9eff" transparent opacity={0.09} />
+            <meshBasicMaterial color="#d4af37" transparent opacity={0.09} />
           </mesh>
         </group>
       ))}
@@ -110,11 +110,11 @@ function Logo() {
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     const grad = ctx.createLinearGradient(0, 0, 1024, 0);
-    grad.addColorStop(0, "#2b8cff");
-    grad.addColorStop(0.5, "#9adeff");
-    grad.addColorStop(1, "#2b8cff");
+    grad.addColorStop(0, "#d4af37");
+    grad.addColorStop(0.5, "#fff1d6");
+    grad.addColorStop(1, "#d4af37");
     ctx.fillStyle = grad;
-    ctx.shadowColor = "#4a9eff";
+    ctx.shadowColor = "#d4af37";
     ctx.shadowBlur = 40;
     ctx.fillText("GYMVERSE", 512, 128);
     return new THREE.CanvasTexture(c);
@@ -134,16 +134,16 @@ function Logo() {
       </mesh>
       <mesh position={[0, 0, -0.05]}>
         <planeGeometry args={[4.8, 1.3]} />
-        <meshBasicMaterial color="#4a9eff" transparent opacity={0.06} toneMapped={false} />
+        <meshBasicMaterial color="#d4af37" transparent opacity={0.06} toneMapped={false} />
       </mesh>
       {/* light sweep */}
       <mesh ref={sweep} position={[0, 0, -0.02]} rotation={[0, 0, 0]}>
         <planeGeometry args={[0.7, 1.35]} />
-        <meshBasicMaterial color="#bde7ff" transparent opacity={0.14} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
+        <meshBasicMaterial color="#fff1d6" transparent opacity={0.14} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
       </mesh>
-      <Sparkles count={26} scale={[6, 2, 3]} size={1.6} speed={0.3} opacity={0.4} color="#7fd0ff" />
-      <Indicator color="#4a9eff" position={[-2, -0.6, 0]} />
-      <Indicator color="#4a9eff" position={[2, -0.6, 0]} />
+      <Sparkles count={26} scale={[6, 2, 3]} size={1.6} speed={0.3} opacity={0.4} color="#f5d77a" />
+      <Indicator color="#d4af37" position={[-2, -0.6, 0]} />
+      <Indicator color="#d4af37" position={[2, -0.6, 0]} />
     </group>
   );
 }
@@ -215,19 +215,19 @@ function Ceiling() {
     <group>
       <mesh position={[0, 6.4, 0]} receiveShadow>
         <boxGeometry args={[76, 0.12, 64]} />
-        <meshStandardMaterial color="#0d0e11" metalness={0.6} roughness={0.4} />
+        <meshStandardMaterial color="#181818" metalness={0.65} roughness={0.36} />
       </mesh>
       {/* light strips */}
       {[-24, -12, 0, 12, 24].map((x) => (
         <mesh key={x} position={[x, 6.2, 0]}>
           <boxGeometry args={[0.35, 0.06, 30]} />
-          <meshStandardMaterial color="#dce9ff" emissive="#4a9eff" emissiveIntensity={1.4} toneMapped={false} />
+          <meshStandardMaterial color="#fff1d6" emissive="#d4af37" emissiveIntensity={1.4} toneMapped={false} />
         </mesh>
       ))}
       {[-18, 0, 18].map((z) => (
         <mesh key={z} position={[0, 6.2, z]}>
           <boxGeometry args={[64, 0.06, 0.35]} />
-          <meshStandardMaterial color="#dce9ff" emissive="#4a9eff" emissiveIntensity={1.0} toneMapped={false} />
+          <meshStandardMaterial color="#fff1d6" emissive="#d4af37" emissiveIntensity={1.0} toneMapped={false} />
         </mesh>
       ))}
     </group>
@@ -283,11 +283,11 @@ export default memo(function GymWorld({ reduced }: { reduced: boolean }) {
           size={1.2}
           speed={0.2}
           opacity={0.3}
-          color="#8fa8bf"
+          color="#f5d77a"
         />
       )}
 
-      <ZoneMarker accent="#f87171" position={[30, 2, 16]} />
+      <ZoneMarker accent="#b8860b" position={[30, 2, 16]} />
     </group>
   );
 });

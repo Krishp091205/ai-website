@@ -5,10 +5,11 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import type { EquipmentKind } from "../level";
 
-const STEEL = { color: "#3c4046", metalness: 0.9, roughness: 0.3 };
-const DARK = { color: "#1c1d20", metalness: 0.6, roughness: 0.5 };
-const MATTE = { color: "#25272b", metalness: 0.2, roughness: 0.85 };
-const CHARCOAL = { color: "#101114", metalness: 0.4, roughness: 0.6 };
+const STEEL = { color: "#b8b9be", metalness: 0.88, roughness: 0.26 };
+const DARK = { color: "#181818", metalness: 0.6, roughness: 0.5 };
+const MATTE = { color: "#252525", metalness: 0.22, roughness: 0.86 };
+const CHARCOAL = { color: "#101010", metalness: 0.42, roughness: 0.6 };
+const GOLD = { color: "#d4af37", metalness: 0.9, roughness: 0.22 };
 
 export function AccentLight({
   color,
@@ -29,7 +30,7 @@ export function AccentLight({
 
 /** Small pulsing indicator light. */
 export function Indicator({
-  color = "#22d3ee",
+  color = "#f5d77a",
   position = [0, 0, 0],
   scale = 0.05,
 }: {
@@ -154,6 +155,10 @@ function SquatRack({ color }: { color: string }) {
       <mesh position={[0, 0.28, 0]} castShadow receiveShadow>
         <boxGeometry args={[2, 0.09, 0.7]} />
         <meshStandardMaterial {...MATTE} />
+      </mesh>
+      <mesh position={[0, 0.325, 0]} castShadow>
+        <boxGeometry args={[1.9, 0.012, 0.03]} />
+        <meshStandardMaterial {...GOLD} />
       </mesh>
       {/* barbell */}
       <mesh position={[0, 1.35, -0.4]} rotation={[0, 0, Math.PI / 2]} castShadow>

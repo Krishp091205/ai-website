@@ -35,10 +35,10 @@ function FlickerLights({ mult }: { mult: number }) {
   return (
     <group>
       {/* central atrium accents */}
-      <pointLight position={[0, 3.2, -4]} color="#4a9eff" intensity={1.4 * mult} distance={14} decay={2} />
-      <pointLight position={[0, 3.2, 9]} color="#6db6ff" intensity={1.2 * mult} distance={14} decay={2} />
-      <pointLight position={[-14, 2.6, 0]} color="#7faeff" intensity={0.8 * mult} distance={12} decay={2} />
-      <pointLight position={[14, 2.6, 0]} color="#7faeff" intensity={0.8 * mult} distance={12} decay={2} />
+      <pointLight position={[0, 3.2, -4]} color="#d4af37" intensity={1.4 * mult} distance={14} decay={2} />
+      <pointLight position={[0, 3.2, 9]} color="#f5d77a" intensity={1.2 * mult} distance={14} decay={2} />
+      <pointLight position={[-14, 2.6, 0]} color="#e8c766" intensity={0.8 * mult} distance={12} decay={2} />
+      <pointLight position={[14, 2.6, 0]} color="#e8c766" intensity={0.8 * mult} distance={12} decay={2} />
     </group>
   );
 }
@@ -55,8 +55,8 @@ export default function GameScene() {
       gl={{ antialias: q.antialias, powerPreference: "high-performance" }}
       className="!fixed inset-0"
     >
-      <color attach="background" args={["#070708"]} />
-      <fog attach="fog" args={["#070708", 34, 90]} />
+      <color attach="background" args={["#080808"]} />
+      <fog attach="fog" args={["#080808", 34, 90]} />
 
       <CameraRig />
       <Suspense fallback={null}>
@@ -65,12 +65,12 @@ export default function GameScene() {
       </Suspense>
 
       {/* scene lights */}
-      <ambientLight intensity={0.55 * q.lightMult} />
-      <hemisphereLight args={["#3a4658", "#0b0b0d", 0.5 * q.lightMult]} />
+      <ambientLight intensity={0.5 * q.lightMult} color="#fff1d6" />
+      <hemisphereLight args={["#f5d77a", "#080808", 0.55 * q.lightMult]} />
       <directionalLight
         position={[-18, 14, 10]}
-        intensity={0.5 * q.lightMult}
-        color="#dbe6ff"
+        intensity={0.55 * q.lightMult}
+        color="#f5d77a"
         castShadow={q.shadows}
         shadow-mapSize={[1024, 1024]}
         shadow-camera-left={-40}
@@ -84,11 +84,11 @@ export default function GameScene() {
       {q.bloom && (
         <EffectComposer>
           <Bloom
-            intensity={0.55}
-            luminanceThreshold={1}
-            luminanceSmoothing={0.2}
+            intensity={0.6}
+            luminanceThreshold={0.9}
+            luminanceSmoothing={0.25}
             mipmapBlur
-            radius={0.7}
+            radius={0.8}
           />
         </EffectComposer>
       )}
