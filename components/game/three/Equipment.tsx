@@ -5,16 +5,21 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import type { EquipmentKind } from "../level";
 
-const STEEL = { color: "#c8c3b6", metalness: 0.88, roughness: 0.26 };
-const DARK = { color: "#17150f", metalness: 0.6, roughness: 0.5 };
-const MATTE = { color: "#26231d", metalness: 0.22, roughness: 0.86 };
-const CHARCOAL = { color: "#120f0b", metalness: 0.42, roughness: 0.6 };
-const GOLD = { color: "#e8c46a", metalness: 0.9, roughness: 0.22 };
+/**
+ * Faceted brutalist materials.
+ * Low metalness + high roughness + flatShading = matte planes you can read,
+ * not soft chrome. Shared across every prop for one consistent language.
+ */
+const STEEL = { color: "#b0aa9b", metalness: 0.32, roughness: 0.72, flatShading: true };
+const DARK = { color: "#17140f", metalness: 0.2, roughness: 0.88, flatShading: true };
+const MATTE = { color: "#26221b", metalness: 0.05, roughness: 0.98, flatShading: true };
+const CHARCOAL = { color: "#120f0b", metalness: 0.12, roughness: 0.92, flatShading: true };
+const GOLD = { color: "#c9a227", metalness: 0.45, roughness: 0.58, flatShading: true };
 
 export function AccentLight({
   color,
   position,
-  intensity = 2.4,
+  intensity = 1,
 }: {
   color: string;
   position: [number, number, number];
@@ -23,12 +28,12 @@ export function AccentLight({
   const ref = useRef<THREE.PointLight>(null);
   useFrame(({ clock }) => {
     if (!ref.current) return;
-    ref.current.intensity = intensity + Math.sin(clock.elapsedTime * 6 + position[0]) * 0.5;
+    ref.current.intensity = intensity + Math.sin(clock.elapsedTime * 6 + position[0]) * 0.2;
   });
-  return <pointLight ref={ref} position={position} color={color} intensity={intensity} distance={9} decay={2} />;
+  return <pointLight ref={ref} position={position} color={color} intensity={intensity} distance={7} decay={2} />;
 }
 
-/** Small pulsing indicator light. */
+/** Hard, low-poly indicator. Icosahedron reads as a faceted marker, not a glowing orb. */
 export function Indicator({
   color = "#f5d77a",
   position = [0, 0, 0],
@@ -42,12 +47,12 @@ export function Indicator({
   useFrame(({ clock }) => {
     if (!m.current) return;
     (m.current.material as THREE.MeshStandardMaterial).emissiveIntensity =
-      2 + Math.sin(clock.elapsedTime * 8) * 1.2;
+      0.9 + Math.sin(clock.elapsedTime * 8) * 0.3;
   });
   return (
     <mesh ref={m} position={position}>
-      <sphereGeometry args={[scale, 8, 8]} />
-      <meshStandardMaterial color={color} emissive={color} emissiveIntensity={2.4} toneMapped={false} />
+      <icosahedronGeometry args={[scale, 0]} />
+      <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.9} flatShading toneMapped={false} />
     </mesh>
   );
 }
@@ -57,7 +62,7 @@ function Treadmill({ color }: { color: string }) {
   useFrame(({ clock }) => {
     if (belt.current) {
       const t = (clock.elapsedTime * 0.6) % 0.7;
-      (belt.current.material as THREE.MeshStandardMaterial).emissiveIntensity = 1 + Math.sin(t * 30) * 0.5;
+      (belt.current.material as THREE.MeshStandardMaterial).emissiveIntensity = 0.5 + Math.sin(t * 30) * 0.25;
     }
   });
   return (
@@ -68,7 +73,7 @@ function Treadmill({ color }: { color: string }) {
       </mesh>
       <mesh ref={belt} position={[0, 0.32, 0.02]}>
         <boxGeometry args={[0.58, 0.03, 1.3]} />
-        <meshStandardMaterial color="#0a0a0b" emissive={color} emissiveIntensity={0.4} toneMapped={false} />
+        <meshStandardMaterial color="#0a0908" emissive={color} emissiveIntensity={0.5} toneMapped={false} />
       </mesh>
       <mesh position={[0, 0.78, -0.4]} castShadow>
         <boxGeometry args={[0.62, 0.7, 0.14]} />
@@ -76,7 +81,7 @@ function Treadmill({ color }: { color: string }) {
       </mesh>
       <mesh position={[0, 1.05, -0.46]}>
         <planeGeometry args={[0.5, 0.32]} />
-        <meshStandardMaterial color="#171107" emissive={color} emissiveIntensity={0.9} toneMapped={false} />
+        <meshStandardMaterial color="#171107" emissive={color} emissiveIntensity={0.6} toneMapped={false} />
       </mesh>
       <Indicator color={color} position={[0.3, 0.6, -0.42]} />
       <Indicator color={color} position={[-0.3, 0.6, -0.42]} />
@@ -100,13 +105,13 @@ function Bike({ color }: { color: string }) {
         <boxGeometry args={[0.55, 0.12, 0.9]} />
       </mesh>
       <group ref={fly} position={[0, 0.95, 0.15]}>
-        <mesh rotation={[0, 0, 0]}>
-          <torusGeometry args={[0.22, 0.04, 10, 20]} />
+        <mesh>
+          <torusGeometry args={[0.22, 0.05, 4, 10]} />
           <meshStandardMaterial {...CHARCOAL} />
         </mesh>
       </group>
       <mesh position={[0, 0.45, 0.15]}>
-        <cylinderGeometry args={[0.25, 0.25, 0.05, 20]} />
+        <cylinderGeometry args={[0.25, 0.25, 0.05, 8]} />
         <meshStandardMaterial {...DARK} />
       </mesh>
       <Indicator color={color} position={[0.34, 0.85, 0.15]} />
@@ -127,10 +132,10 @@ function Rower({ color }: { color: string }) {
       </mesh>
       <mesh ref={handle} position={[0, 0.55, 0.3]}>
         <boxGeometry args={[0.5, 0.05, 0.08]} />
-        <meshStandardMaterial color="#d8d0bd" metalness={0.8} roughness={0.3} />
+        <meshStandardMaterial color="#b0aa9b" metalness={0.35} roughness={0.7} flatShading />
       </mesh>
       <mesh position={[0, 0.5, -0.85]}>
-        <cylinderGeometry args={[0.16, 0.22, 0.1, 18]} />
+        <cylinderGeometry args={[0.16, 0.22, 0.1, 8]} />
         <meshStandardMaterial {...DARK} />
       </mesh>
       <Indicator color={color} position={[0.28, 0.8, -0.5]} />
@@ -160,10 +165,9 @@ function SquatRack({ color }: { color: string }) {
         <boxGeometry args={[1.9, 0.012, 0.03]} />
         <meshStandardMaterial {...GOLD} />
       </mesh>
-      {/* barbell */}
       <mesh position={[0, 1.35, -0.4]} rotation={[0, 0, Math.PI / 2]} castShadow>
-        <cylinderGeometry args={[0.025, 0.025, 1.9, 10]} />
-        <meshStandardMaterial color="#d8d0bd" metalness={0.9} roughness={0.25} />
+        <cylinderGeometry args={[0.025, 0.025, 1.9, 8]} />
+        <meshStandardMaterial color="#b0aa9b" metalness={0.4} roughness={0.65} flatShading />
       </mesh>
       <Indicator color={color} position={[0.62, 0.3, -0.12]} />
       <Indicator color={color} position={[-0.62, 0.3, -0.12]} />
@@ -189,8 +193,8 @@ function BenchPress({ color }: { color: string }) {
         </mesh>
       ))}
       <mesh position={[0, 1.45, -0.4]} rotation={[0, 0, Math.PI / 2]} castShadow>
-        <cylinderGeometry args={[0.03, 0.03, 1.7, 10]} />
-        <meshStandardMaterial color="#d8d0bd" metalness={0.9} roughness={0.25} />
+        <cylinderGeometry args={[0.03, 0.03, 1.7, 8]} />
+        <meshStandardMaterial color="#b0aa9b" metalness={0.4} roughness={0.65} flatShading />
       </mesh>
       <Indicator color={color} position={[0.32, 0.2, 0.9]} />
     </group>
@@ -216,7 +220,7 @@ function DumbbellRack({ color }: { color: string }) {
             rotation={[0, 0, i === 0 ? Math.PI / 2 : 0]}
             castShadow
           >
-            <cylinderGeometry args={[0.035, 0.035, 0.3, 10]} />
+            <cylinderGeometry args={[0.035, 0.035, 0.3, 6]} />
             <meshStandardMaterial {...STEEL} />
           </mesh>
         ))
@@ -231,8 +235,8 @@ function Kettlebell({ color }: { color: string }) {
     <group>
       {[-0.5, 0, 0.5].map((x) => (
         <mesh key={x} position={[x, 0.22, 0]} scale={[1, 0.85, 1]} castShadow>
-          <sphereGeometry args={[0.1, 12, 10]} />
-          <meshStandardMaterial color="#191a1d" metalness={0.6} roughness={0.5} />
+          <icosahedronGeometry args={[0.11, 0]} />
+          <meshStandardMaterial color="#191713" metalness={0.2} roughness={0.9} flatShading />
         </mesh>
       ))}
       <mesh position={[0, 0.03, 0]} castShadow receiveShadow>
@@ -249,15 +253,15 @@ function PlyoBoxes({ color }: { color: string }) {
     <group>
       <mesh position={[0, 0.3, 0]} castShadow receiveShadow>
         <boxGeometry args={[0.7, 0.6, 0.7]} />
-        <meshStandardMaterial color="#2e2a22" metalness={0.3} roughness={0.6} />
+        <meshStandardMaterial color="#2e2a22" metalness={0.16} roughness={0.9} flatShading />
       </mesh>
       <mesh position={[0.9, 0.45, 0]} castShadow receiveShadow>
         <boxGeometry args={[0.65, 0.9, 0.65]} />
-        <meshStandardMaterial color="#27241d" metalness={0.3} roughness={0.6} />
+        <meshStandardMaterial color="#27241d" metalness={0.16} roughness={0.9} flatShading />
       </mesh>
       <mesh position={[-0.9, 0.15, 0]} castShadow receiveShadow>
         <boxGeometry args={[0.65, 0.3, 0.65]} />
-        <meshStandardMaterial color="#353027" metalness={0.3} roughness={0.6} />
+        <meshStandardMaterial color="#353027" metalness={0.16} roughness={0.9} flatShading />
       </mesh>
       <Indicator color={color} position={[0.3, 0.5, -0.28]} />
     </group>
@@ -277,7 +281,7 @@ function Ropes({ color }: { color: string }) {
     <group>
       {[0, 1].map((i) => (
         <mesh key={i} position={[(i - 0.5) * 0.9, 0.4, 0]}>
-          <torusGeometry args={[0.42, 0.06, 8, 20]} />
+          <torusGeometry args={[0.42, 0.06, 4, 10]} />
           <meshStandardMaterial {...STEEL} />
         </mesh>
       ))}
@@ -285,7 +289,7 @@ function Ropes({ color }: { color: string }) {
         {Array.from({ length: 5 }, (_, i) => (
           <mesh key={i} position={[(i - 2) * 0.34, 0.92, 0]} castShadow>
             <boxGeometry args={[0.34, 1.8, 0.045]} />
-            <meshStandardMaterial color="#322e26" metalness={0} roughness={0.95} />
+            <meshStandardMaterial color="#322e26" metalness={0} roughness={0.98} flatShading />
           </mesh>
         ))}
       </group>
@@ -300,11 +304,11 @@ function Mat({ color }: { color: string }) {
     <group>
       <mesh position={[0, 0.035, 0]} receiveShadow>
         <boxGeometry args={[1.6, 0.07, 2.2]} />
-        <meshStandardMaterial color="#26231d" metalness={0.1} roughness={0.9} />
+        <meshStandardMaterial color="#26231d" metalness={0.05} roughness={1} flatShading />
       </mesh>
       <mesh position={[0, 0.05, 0]}>
         <planeGeometry args={[1.2, 1.8]} />
-        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.16} transparent opacity={0.4} toneMapped={false} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.12} transparent opacity={0.4} toneMapped={false} />
       </mesh>
       <Indicator color={color} position={[-0.6, 0.3, -0.9]} />
     </group>
@@ -316,22 +320,22 @@ function Sauna({ color }: { color: string }) {
   useFrame(({ clock }) => {
     if (glow.current) {
       (glow.current.material as THREE.MeshStandardMaterial).emissiveIntensity =
-        1.2 + Math.sin(clock.elapsedTime * 2.5) * 0.6;
+        0.7 + Math.sin(clock.elapsedTime * 2.5) * 0.25;
     }
   });
   return (
     <group>
       <mesh position={[0, 0.8, 0]} castShadow receiveShadow>
-        <cylinderGeometry args={[0.7, 0.78, 1.6, 24]} />
+        <cylinderGeometry args={[0.7, 0.78, 1.6, 8]} />
         <meshStandardMaterial {...DARK} />
       </mesh>
       <mesh position={[0, 0.85, 0.55]}>
-        <torusGeometry args={[0.4, 0.04, 8, 24]} />
+        <torusGeometry args={[0.4, 0.05, 4, 10]} />
         <meshStandardMaterial {...STEEL} />
       </mesh>
       <mesh ref={glow} position={[0, 0.9, 0.56]}>
-        <circleGeometry args={[0.3, 20]} />
-        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={1.2} toneMapped={false} />
+        <circleGeometry args={[0.3, 8]} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.7} flatShading toneMapped={false} />
       </mesh>
       <Indicator color={color} position={[-0.5, 0.3, 0.5]} />
     </group>

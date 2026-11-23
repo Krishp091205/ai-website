@@ -2,7 +2,6 @@
 
 import { memo, useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { Sparkles } from "@react-three/drei";
 import * as THREE from "three";
 import {
   COLLISION_MAP,
@@ -16,8 +15,10 @@ import ZoneTag from "./ZoneTag";
 
 const WALL_H = 3.4;
 
-const WALL = { color: "#25221c", metalness: 0.42, roughness: 0.52 };
-const WALL_TRIM = { color: "#17150f", metalness: 0.55, roughness: 0.45 };
+/** Brutalist surfaces: matte, low metalness, flat normals. */
+const WALL = { color: "#231f1a", metalness: 0.14, roughness: 0.94, flatShading: true };
+const WALL_TRIM = { color: "#14110c", metalness: 0.26, roughness: 0.82, flatShading: true };
+const FLOOR = { color: "#100e0c", metalness: 0.08, roughness: 0.98, flatShading: true };
 
 function Walls() {
   const boxes = useMemo(
@@ -45,6 +46,7 @@ function Walls() {
   );
 }
 
+/** Hard satin-brass band at eye level. Reads as a line, not a glow. */
 function WallTrim() {
   const boxes = useMemo(
     () =>
@@ -66,53 +68,12 @@ function WallTrim() {
         <mesh key={`trim-${b.key}`} position={b.pos}>
           <boxGeometry args={b.size} />
           <meshStandardMaterial
-            color="#d4af37"
-            emissive="#7d611c"
-            emissiveIntensity={0.45}
-            metalness={0.82}
-            roughness={0.3}
-          />
-        </mesh>
-      ))}
-    </group>
-  );
-}
-
-function LightPools() {
-  const texture = useMemo(() => {
-    const c = document.createElement("canvas");
-    c.width = 256;
-    c.height = 256;
-    const ctx = c.getContext("2d")!;
-    const gradient = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
-    gradient.addColorStop(0, "rgba(232,196,106,0.55)");
-    gradient.addColorStop(0.45, "rgba(232,196,106,0.16)");
-    gradient.addColorStop(1, "rgba(232,196,106,0)");
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, 256, 256);
-    return new THREE.CanvasTexture(c);
-  }, []);
-
-  return (
-    <group>
-      {[
-        [0, -4, 18],
-        [0, 9, 16],
-        [-16, 0, 14],
-        [16, 0, 14],
-      ].map(([x, z, scale], i) => (
-        <mesh
-          key={i}
-          rotation={[-Math.PI / 2, 0, 0]}
-          position={[x, 0.008, z]}
-        >
-          <planeGeometry args={[scale, scale]} />
-          <meshBasicMaterial
-            map={texture}
-            transparent
-            depthWrite={false}
-            blending={THREE.AdditiveBlending}
-            toneMapped={false}
+            color="#c9a227"
+            emissive="#5e4a12"
+            emissiveIntensity={0.18}
+            metalness={0.45}
+            roughness={0.62}
+            flatShading
           />
         </mesh>
       ))}
@@ -127,14 +88,14 @@ function FloorGrid() {
     if (!ref.current) return;
     const material = ref.current.material as THREE.LineBasicMaterial;
     material.transparent = true;
-    material.opacity = 0.07;
+    material.opacity = 0.16;
     material.depthWrite = false;
   }, []);
 
   return (
     <gridHelper
       ref={ref}
-      args={[76, 38, "#d4af37", "#3b382f"]}
+      args={[76, 38, "#c9a227", "#4a453a"]}
       position={[0, 0.006, 0]}
     />
   );
@@ -145,33 +106,30 @@ function Floor() {
     <group>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow>
         <planeGeometry args={[76, 64]} />
-        <meshStandardMaterial color="#0f0f0e" metalness={0.28} roughness={0.62} />
+        <meshStandardMaterial {...FLOOR} />
       </mesh>
       <FloorGrid />
-      <LightPools />
-      {/* zone accent floor tiles */}
+      {/* hard zone plates — flat, opaque-edged colour blocks */}
       {WORLD_ZONES.filter((z) => z.id !== "entry").map((z) => (
         <mesh key={z.id} rotation={[-Math.PI / 2, 0, 0]} position={[(z.x0 + z.x1) / 2, 0.003, (z.z0 + z.z1) / 2]}>
           <planeGeometry args={[z.x1 - z.x0, z.z1 - z.z0]} />
-          <meshBasicMaterial color={z.accent} transparent opacity={0.07} />
+          <meshBasicMaterial color={z.accent} transparent opacity={0.1} />
         </mesh>
       ))}
     </group>
   );
 }
 
+/** Single crisp line per path. No soft outer glow. */
 function PathStrips() {
   const seg = useMemo(() => {
-    const arr: { a: [number, number]; b: [number, number]; len: number; pos: [number, number, number]; rot: number }[] = [];
+    const arr: { len: number; pos: [number, number, number]; rot: number }[] = [];
     for (const p of PATHS) {
       const ax = p.start[0], az = p.start[2];
       const bx = p.end[0], bz = p.end[2];
       const dx = bx - ax, dz = bz - az;
-      const len = Math.hypot(dx, dz);
       arr.push({
-        a: [ax, az],
-        b: [bx, bz],
-        len,
+        len: Math.hypot(dx, dz),
         pos: [(ax + bx) / 2, 0.02, (az + bz) / 2],
         rot: Math.atan2(dx, dz),
       });
@@ -183,12 +141,8 @@ function PathStrips() {
       {seg.map((s, i) => (
         <group key={i} position={s.pos} rotation={[0, s.rot, 0]}>
           <mesh rotation={[-Math.PI / 2, 0, 0]}>
-            <planeGeometry args={[0.55, s.len]} />
-            <meshBasicMaterial color="#f1cf7c" transparent opacity={0.62} />
-          </mesh>
-          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.002, 0]}>
-            <planeGeometry args={[0.8, s.len]} />
-            <meshBasicMaterial color="#d4af37" transparent opacity={0.12} />
+            <planeGeometry args={[0.14, s.len]} />
+            <meshBasicMaterial color="#e8c46a" />
           </mesh>
         </group>
       ))}
@@ -196,6 +150,7 @@ function PathStrips() {
   );
 }
 
+/** Flat stencil logo. No blur, no light sweep, no particles. */
 function Logo() {
   const logo = useMemo(() => {
     const c = document.createElement("canvas");
@@ -206,39 +161,21 @@ function Logo() {
     ctx.font = "700 150px 'Oswald', sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    const grad = ctx.createLinearGradient(0, 0, 1024, 0);
-    grad.addColorStop(0, "#d4af37");
-    grad.addColorStop(0.5, "#fff1d6");
-    grad.addColorStop(1, "#d4af37");
-    ctx.fillStyle = grad;
-    ctx.shadowColor = "#d4af37";
-    ctx.shadowBlur = 40;
+    ctx.fillStyle = "#d4af37";
     ctx.fillText("GYMVERSE", 512, 128);
     return new THREE.CanvasTexture(c);
   }, []);
-  const sweep = useRef<THREE.Mesh>(null);
-  useFrame(({ clock }) => {
-    if (sweep.current) {
-      const x = ((clock.elapsedTime * 0.6) % 2) - 1;
-      sweep.current.position.x = x;
-    }
-  });
+
   return (
     <group position={[0, 1.6, 4]}>
       <mesh position={[0, 0, 0]}>
         <planeGeometry args={[4.6, 1.15]} />
         <meshBasicMaterial map={logo} transparent toneMapped={false} />
       </mesh>
-      <mesh position={[0, 0, -0.05]}>
-        <planeGeometry args={[4.8, 1.3]} />
-        <meshBasicMaterial color="#d4af37" transparent opacity={0.06} toneMapped={false} />
+      <mesh position={[0, 0, -0.02]}>
+        <planeGeometry args={[4.7, 1.24]} />
+        <meshBasicMaterial color="#c9a227" toneMapped={false} />
       </mesh>
-      {/* light sweep */}
-      <mesh ref={sweep} position={[0, 0, -0.02]} rotation={[0, 0, 0]}>
-        <planeGeometry args={[0.7, 1.35]} />
-        <meshBasicMaterial color="#fff1d6" transparent opacity={0.14} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
-      </mesh>
-      <Sparkles count={26} scale={[6, 2, 3]} size={1.6} speed={0.3} opacity={0.4} color="#f5d77a" />
       <Indicator color="#d4af37" position={[-2, -0.6, 0]} />
       <Indicator color="#d4af37" position={[2, -0.6, 0]} />
     </group>
@@ -264,16 +201,14 @@ function Terminal({ id }: { id: string }) {
     ctx.fillText(t.label, 256, 210);
     ctx.font = "600 52px 'Oswald', sans-serif";
     ctx.fillStyle = "#fff";
-    ctx.globalAlpha = 0.7;
     ctx.fillText("PRESS [E]", 256, 320);
-    ctx.globalAlpha = 1;
     return new THREE.CanvasTexture(c);
   }, [t]);
   const screen = useRef<THREE.Mesh>(null);
   useFrame(({ clock }) => {
     if (screen.current) {
       (screen.current.material as THREE.MeshStandardMaterial).emissiveIntensity =
-        1.1 + Math.sin(clock.elapsedTime * 4) * 0.3;
+        0.85 + Math.sin(clock.elapsedTime * 4) * 0.15;
     }
   });
   return (
@@ -284,13 +219,13 @@ function Terminal({ id }: { id: string }) {
       </mesh>
       <mesh ref={screen} position={[0, 1.5, 0]}>
         <planeGeometry args={[1.5, 1.5]} />
-        <meshStandardMaterial map={face} emissiveMap={face} emissive={t.accent} emissiveIntensity={1.1} toneMapped={false} />
+        <meshStandardMaterial map={face} emissiveMap={face} emissive={t.accent} emissiveIntensity={0.85} toneMapped={false} flatShading />
       </mesh>
       <mesh position={[0, 0.95, 0.02]}>
         <boxGeometry args={[1.9, 0.06, 0.06]} />
-        <meshStandardMaterial color={t.accent} emissive={t.accent} emissiveIntensity={2} toneMapped={false} />
+        <meshStandardMaterial color={t.accent} emissive={t.accent} emissiveIntensity={1} toneMapped={false} />
       </mesh>
-      <AccentLight color={t.accent} position={[0, 2.2, 0.3]} intensity={2} />
+      <AccentLight color={t.accent} position={[0, 2.2, 0.3]} intensity={1} />
       <Indicator color={t.accent} position={[0.9, 0.3, 0.28]} />
     </group>
   );
@@ -299,9 +234,9 @@ function Terminal({ id }: { id: string }) {
 function ZoneMarker({ accent, position }: { accent: string; position: [number, number, number] }) {
   return (
     <group position={position}>
-      <mesh rotation={[0, 0, 0]}>
+      <mesh>
         <planeGeometry args={[1.2, 1.2]} />
-        <meshBasicMaterial color={accent} transparent opacity={0.08} toneMapped={false} />
+        <meshBasicMaterial color={accent} transparent opacity={0.14} toneMapped={false} />
       </mesh>
     </group>
   );
@@ -312,26 +247,26 @@ function Ceiling() {
     <group>
       <mesh position={[0, 6.4, 0]} receiveShadow>
         <boxGeometry args={[76, 0.12, 64]} />
-        <meshStandardMaterial color="#17150f" metalness={0.65} roughness={0.36} />
+        <meshStandardMaterial color="#14110c" metalness={0.3} roughness={0.84} flatShading />
       </mesh>
-      {/* light strips */}
+      {/* raw fluorescent bars — hard emissive, no halo */}
       {[-24, -12, 0, 12, 24].map((x) => (
         <mesh key={x} position={[x, 6.2, 0]}>
           <boxGeometry args={[0.35, 0.06, 30]} />
-          <meshStandardMaterial color="#fff1d6" emissive="#e8c46a" emissiveIntensity={2.1} toneMapped={false} />
+          <meshBasicMaterial color="#ffe6b0" toneMapped={false} />
         </mesh>
       ))}
       {[-18, 0, 18].map((z) => (
         <mesh key={z} position={[0, 6.2, z]}>
           <boxGeometry args={[64, 0.06, 0.35]} />
-          <meshStandardMaterial color="#fff1d6" emissive="#e8c46a" emissiveIntensity={1.6} toneMapped={false} />
+          <meshBasicMaterial color="#ffe6b0" toneMapped={false} />
         </mesh>
       ))}
     </group>
   );
 }
 
-export default memo(function GymWorld({ reduced }: { reduced: boolean }) {
+const memoized = memo(function GymWorld() {
   return (
     <group>
       <Floor />
@@ -368,24 +303,14 @@ export default memo(function GymWorld({ reduced }: { reduced: boolean }) {
         <Equipment key={i} kind={p.kind} color={p.accent} position={p.position} rotY={p.rotY ?? 0} />
       ))}
 
-      {/* per-zone ambient accent lights near doorways */}
+      {/* sparse zone practicals */}
       {WORLD_ZONES.filter((z) => z.id !== "entry").map((z) => (
-        <AccentLight key={z.id} color={z.accent} position={[(z.x0 + z.x1) / 2, 2.8, (z.z0 + z.z1) / 2]} intensity={1.6} />
+        <AccentLight key={z.id} color={z.accent} position={[(z.x0 + z.x1) / 2, 2.8, (z.z0 + z.z1) / 2]} intensity={0.8} />
       ))}
-
-      {!reduced && (
-        <Sparkles
-          count={120}
-          scale={[60, 5, 50]}
-          position={[0, 2.8, 0]}
-          size={1.2}
-          speed={0.2}
-          opacity={0.3}
-          color="#f5d77a"
-        />
-      )}
 
       <ZoneMarker accent="#b8860b" position={[30, 2, 16]} />
     </group>
   );
 });
+
+export default memoized;
