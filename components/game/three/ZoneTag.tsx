@@ -5,7 +5,7 @@ import * as THREE from "three";
 
 export default function ZoneTag({
   text,
-  color = "#4a9eff",
+  color = "#e8c46a",
   width = 3.4,
   height = 0.62,
   position = [0, 0, 0],

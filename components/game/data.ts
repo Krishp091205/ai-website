@@ -68,40 +68,55 @@ export interface ZoneAnchor {
 export const ZONES: Record<PortalId, { name: string; accent: string; blurb: string; anchor: ZoneAnchor }> = {
   about: {
     name: "ABOUT",
-    accent: "#4a9eff",
-    blurb: "We built a stadium for human effort.",
+    accent: "#e8c46a",
+    blurb: "A 14,000 sq ft arena built for focused work.",
     anchor: { to: [1, 2, -15.6], look: [4, 1.6, -14.2] },
   },
   programs: {
     name: "PROGRAMS",
-    accent: "#4a9eff",
-    blurb: "Every program is a mission. Pick yours.",
+    accent: "#e8c46a",
+    blurb: "Five progressive missions. Choose your objective.",
     anchor: { to: [16, 2, -3.8], look: [13.5, 1.6, -2.5] },
   },
   trainers: {
     name: "TRAINERS",
-    accent: "#9dbaff",
+    accent: "#f8dda0",
     blurb: "Coaches who compete, not sell.",
     anchor: { to: [15.6, 2, 4.6], look: [13.5, 1.6, 3.4] },
   },
   facility: {
     name: "FACILITY",
-    accent: "#4a9eff",
-    blurb: "Six zones. One arena.",
+    accent: "#e8c46a",
+    blurb: "Six purpose-built zones under one roof.",
     anchor: { to: [-15.6, 2, -6], look: [-13.5, 1.6, -5] },
   },
   membership: {
     name: "MEMBERSHIP",
-    accent: "#f59e0b",
-    blurb: "Where legends rest between sets.",
+    accent: "#ffe0a3",
+    blurb: "Three ways in. One standard.",
     anchor: { to: [14, 2, 12.2], look: [13, 1.6, 10.2] },
   },
   contact: {
     name: "CONTACT",
-    accent: "#4a9eff",
-    blurb: "Talk to a human. We have those.",
+    accent: "#e8c46a",
+    blurb: "Book a visit. A real coach replies.",
     anchor: { to: [-15.6, 2, 4.6], look: [-13.5, 1.6, 3.5] },
   },
+};
+
+export const PORTAL_LEDES: Record<PortalId, string> = {
+  about:
+    "No mirrors, no filler. Just calibrated equipment, serious coaching, and a floor built for work.",
+  programs:
+    "Pick a training mission, see the objective and difficulty, then accept it to add it to your active plan.",
+  trainers:
+    "Meet the coaches who program, spot, and push. Open a file to see their specialties and request a session.",
+  facility:
+    "Every zone has a job. Move through the floor to see what each space is built for.",
+  membership:
+    "Three access levels with one promise: the floor, the coaching, and the recovery tools are all real.",
+  contact:
+    "Book a tour, ask about a program, or request a membership. A coach replies within 24 hours.",
 };
 
 export interface Program {
@@ -334,13 +349,13 @@ export const FACILITY_ZONES: FacilityZone[] = [
 ];
 
 export const ABOUT_COPY = {
-  tagline: "ENTER THE GRIND.",
+  tagline: "TRAIN WITHOUT APOLOGY.",
   image: `${IMG}about.jpg`,
   body: [
-    "GYMVERSE was built on a single conviction: training is not a routine, it is a performance.",
-    "Opening our doors in 2019, we refused to build another box of mirrors and cardio desks. Instead we built a stadium for human effort — a 14,000 sq ft arena of calibrated steel, precision flooring, and atmosphere engineered for focus. From the deadlift stage to the recovery lounge, every square foot is designed around one idea: let the work speak.",
-    "Our coaches are competitors, not salespeople. Our members are protagonists, not customers. And our facility is the world they enter when they decide, again, to get better.",
-    "This is a gym. This is a game. Every rep counts. Every set builds you. Every day changes you.",
+    "GYMVERSE was built on a single conviction: training is not a routine — it is a performance.",
+    "When we opened in 2019, we refused to build another room of mirrors and cardio desks. Instead we built a 14,000 sq ft arena of calibrated steel, precision flooring, and lighting engineered for focus. From the deadlift stage to the recovery lounge, every square foot has one job: let the work speak.",
+    "Our coaches are competitors, not salespeople. Our members are participants, not customers. The floor is where you stop negotiating and start building.",
+    "Every rep counts. Every set builds you. Every day changes you.",
   ],
   stats: [
     { label: "SQ FT ARENA", value: "14,000" },

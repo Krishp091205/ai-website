@@ -20,7 +20,7 @@ export default function TunnelFlash() {
             className="absolute inset-0"
             style={{
               background:
-                "radial-gradient(circle at center, rgba(190,225,255,0.55) 0%, rgba(74,158,255,0.18) 30%, rgba(0,0,0,0.55) 75%, #000 100%)",
+                "radial-gradient(circle at center, rgba(255,241,214,0.6) 0%, rgba(232,196,106,0.24) 30%, rgba(0,0,0,0.55) 75%, #000 100%)",
               filter: "blur(18px)",
             }}
             animate={{ scale: [0.35, 1.25], opacity: [1, 0] }}
@@ -50,7 +50,7 @@ export default function TunnelFlash() {
             className="absolute inset-0"
             style={{
               background:
-                "radial-gradient(circle at center, rgba(74,158,255,0.1) 0%, transparent 55%)",
+                "radial-gradient(circle at center, rgba(232,196,106,0.12) 0%, transparent 55%)",
             }}
           />
         </motion.div>

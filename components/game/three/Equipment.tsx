@@ -5,11 +5,11 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import type { EquipmentKind } from "../level";
 
-const STEEL = { color: "#b8b9be", metalness: 0.88, roughness: 0.26 };
-const DARK = { color: "#181818", metalness: 0.6, roughness: 0.5 };
-const MATTE = { color: "#252525", metalness: 0.22, roughness: 0.86 };
-const CHARCOAL = { color: "#101010", metalness: 0.42, roughness: 0.6 };
-const GOLD = { color: "#d4af37", metalness: 0.9, roughness: 0.22 };
+const STEEL = { color: "#c8c3b6", metalness: 0.88, roughness: 0.26 };
+const DARK = { color: "#17150f", metalness: 0.6, roughness: 0.5 };
+const MATTE = { color: "#26231d", metalness: 0.22, roughness: 0.86 };
+const CHARCOAL = { color: "#120f0b", metalness: 0.42, roughness: 0.6 };
+const GOLD = { color: "#e8c46a", metalness: 0.9, roughness: 0.22 };
 
 export function AccentLight({
   color,
@@ -76,7 +76,7 @@ function Treadmill({ color }: { color: string }) {
       </mesh>
       <mesh position={[0, 1.05, -0.46]}>
         <planeGeometry args={[0.5, 0.32]} />
-        <meshStandardMaterial color="#04121f" emissive={color} emissiveIntensity={0.9} toneMapped={false} />
+        <meshStandardMaterial color="#171107" emissive={color} emissiveIntensity={0.9} toneMapped={false} />
       </mesh>
       <Indicator color={color} position={[0.3, 0.6, -0.42]} />
       <Indicator color={color} position={[-0.3, 0.6, -0.42]} />
@@ -127,7 +127,7 @@ function Rower({ color }: { color: string }) {
       </mesh>
       <mesh ref={handle} position={[0, 0.55, 0.3]}>
         <boxGeometry args={[0.5, 0.05, 0.08]} />
-        <meshStandardMaterial color="#c9ccd2" metalness={0.8} roughness={0.3} />
+        <meshStandardMaterial color="#d8d0bd" metalness={0.8} roughness={0.3} />
       </mesh>
       <mesh position={[0, 0.5, -0.85]}>
         <cylinderGeometry args={[0.16, 0.22, 0.1, 18]} />
@@ -163,7 +163,7 @@ function SquatRack({ color }: { color: string }) {
       {/* barbell */}
       <mesh position={[0, 1.35, -0.4]} rotation={[0, 0, Math.PI / 2]} castShadow>
         <cylinderGeometry args={[0.025, 0.025, 1.9, 10]} />
-        <meshStandardMaterial color="#c9ccd2" metalness={0.9} roughness={0.25} />
+        <meshStandardMaterial color="#d8d0bd" metalness={0.9} roughness={0.25} />
       </mesh>
       <Indicator color={color} position={[0.62, 0.3, -0.12]} />
       <Indicator color={color} position={[-0.62, 0.3, -0.12]} />
@@ -190,7 +190,7 @@ function BenchPress({ color }: { color: string }) {
       ))}
       <mesh position={[0, 1.45, -0.4]} rotation={[0, 0, Math.PI / 2]} castShadow>
         <cylinderGeometry args={[0.03, 0.03, 1.7, 10]} />
-        <meshStandardMaterial color="#c9ccd2" metalness={0.9} roughness={0.25} />
+        <meshStandardMaterial color="#d8d0bd" metalness={0.9} roughness={0.25} />
       </mesh>
       <Indicator color={color} position={[0.32, 0.2, 0.9]} />
     </group>
@@ -249,15 +249,15 @@ function PlyoBoxes({ color }: { color: string }) {
     <group>
       <mesh position={[0, 0.3, 0]} castShadow receiveShadow>
         <boxGeometry args={[0.7, 0.6, 0.7]} />
-        <meshStandardMaterial color="#2c2e33" metalness={0.3} roughness={0.6} />
+        <meshStandardMaterial color="#2e2a22" metalness={0.3} roughness={0.6} />
       </mesh>
       <mesh position={[0.9, 0.45, 0]} castShadow receiveShadow>
         <boxGeometry args={[0.65, 0.9, 0.65]} />
-        <meshStandardMaterial color="#23252a" metalness={0.3} roughness={0.6} />
+        <meshStandardMaterial color="#27241d" metalness={0.3} roughness={0.6} />
       </mesh>
       <mesh position={[-0.9, 0.15, 0]} castShadow receiveShadow>
         <boxGeometry args={[0.65, 0.3, 0.65]} />
-        <meshStandardMaterial color="#303238" metalness={0.3} roughness={0.6} />
+        <meshStandardMaterial color="#353027" metalness={0.3} roughness={0.6} />
       </mesh>
       <Indicator color={color} position={[0.3, 0.5, -0.28]} />
     </group>
@@ -285,7 +285,7 @@ function Ropes({ color }: { color: string }) {
         {Array.from({ length: 5 }, (_, i) => (
           <mesh key={i} position={[(i - 2) * 0.34, 0.92, 0]} castShadow>
             <boxGeometry args={[0.34, 1.8, 0.045]} />
-            <meshStandardMaterial color="#2f3135" metalness={0} roughness={0.95} />
+            <meshStandardMaterial color="#322e26" metalness={0} roughness={0.95} />
           </mesh>
         ))}
       </group>
@@ -300,7 +300,7 @@ function Mat({ color }: { color: string }) {
     <group>
       <mesh position={[0, 0.035, 0]} receiveShadow>
         <boxGeometry args={[1.6, 0.07, 2.2]} />
-        <meshStandardMaterial color="#23262d" metalness={0.1} roughness={0.9} />
+        <meshStandardMaterial color="#26231d" metalness={0.1} roughness={0.9} />
       </mesh>
       <mesh position={[0, 0.05, 0]}>
         <planeGeometry args={[1.2, 1.8]} />

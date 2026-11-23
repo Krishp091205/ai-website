@@ -20,11 +20,13 @@ export default function WorldMap({ onClose }: { onClose: () => void }) {
     sound.whoosh();
     const z = ROOM_BY_ID[id];
     if (id === "entry") {
-      useGame.setState({ playerPos: [0, 0, 8], currentZone: "entry" });
+      useGame.getState().teleportTo([0, 0, 8], "entry");
+      useGame.getState().setObjective("EXPLORE THE TRAINING FLOOR");
     } else {
       const cx = (z.x0 + z.x1) / 2;
       const cz = (z.z0 + z.z1) / 2;
-      useGame.setState({ playerPos: [cx, 0, cz], currentZone: id });
+      useGame.getState().teleportTo([cx, 0, cz], id);
+      useGame.getState().setObjective(`EXPLORE THE ${z.name} ZONE`, false);
     }
     onClose();
   };
@@ -43,7 +45,7 @@ export default function WorldMap({ onClose }: { onClose: () => void }) {
         <div>
           <h2 className="font-display text-2xl tracking-[0.2em] text-white">GYM MAP</h2>
           <p className="mt-1 text-[10px] tracking-[0.26em] text-muted">
-            TAP A ZONE TO TRAVEL
+            SELECT A ZONE TO TRAVEL
           </p>
         </div>
         <button
@@ -59,7 +61,7 @@ export default function WorldMap({ onClose }: { onClose: () => void }) {
         </button>
       </div>
 
-      <div className="relative mt-6 aspect-[70/62] w-full overflow-hidden rounded-sm border border-line bg-[radial-gradient(100%_100%_at_50%_40%,#0d1624_0%,#06070b_100%)]">
+      <div className="relative mt-6 aspect-[70/62] w-full overflow-hidden rounded-sm border border-line bg-[radial-gradient(100%_100%_at_50%_40%,#19160f_0%,#080807_100%)]">
         {/* zone cells */}
         {WORLD_ZONES.filter((z) => z.id !== "entry").map((z) => {
           const active = currentZone === z.id;
@@ -104,7 +106,7 @@ export default function WorldMap({ onClose }: { onClose: () => void }) {
           }}
         >
           <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-[10px] tracking-[0.22em] text-accent">
-            ENTRY
+            ENTRY ATRIUM
           </span>
         </div>
 

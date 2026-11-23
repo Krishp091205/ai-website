@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useMemo, useRef } from "react";
+import { memo, useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Sparkles } from "@react-three/drei";
 import * as THREE from "three";
@@ -16,8 +16,8 @@ import ZoneTag from "./ZoneTag";
 
 const WALL_H = 3.4;
 
-const WALL = { color: "#252525", metalness: 0.42, roughness: 0.52 };
-const WALL_TRIM = { color: "#181818", metalness: 0.55, roughness: 0.45 };
+const WALL = { color: "#25221c", metalness: 0.42, roughness: 0.52 };
+const WALL_TRIM = { color: "#17150f", metalness: 0.55, roughness: 0.45 };
 
 function Walls() {
   const boxes = useMemo(
@@ -45,18 +45,115 @@ function Walls() {
   );
 }
 
+function WallTrim() {
+  const boxes = useMemo(
+    () =>
+      COLLISION_MAP.map(([x0, z0, x1, z1], i) => {
+        const w = Math.abs(x1 - x0);
+        const d = Math.abs(z1 - z0);
+        return {
+          key: i,
+          pos: [x0 + (x1 - x0) / 2, 1.15, z0 + (z1 - z0) / 2] as [number, number, number],
+          size: [w + 0.02, 0.05, d + 0.02] as [number, number, number],
+        };
+      }),
+    []
+  );
+
+  return (
+    <group>
+      {boxes.map((b) => (
+        <mesh key={`trim-${b.key}`} position={b.pos}>
+          <boxGeometry args={b.size} />
+          <meshStandardMaterial
+            color="#d4af37"
+            emissive="#7d611c"
+            emissiveIntensity={0.45}
+            metalness={0.82}
+            roughness={0.3}
+          />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+function LightPools() {
+  const texture = useMemo(() => {
+    const c = document.createElement("canvas");
+    c.width = 256;
+    c.height = 256;
+    const ctx = c.getContext("2d")!;
+    const gradient = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
+    gradient.addColorStop(0, "rgba(232,196,106,0.55)");
+    gradient.addColorStop(0.45, "rgba(232,196,106,0.16)");
+    gradient.addColorStop(1, "rgba(232,196,106,0)");
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 256, 256);
+    return new THREE.CanvasTexture(c);
+  }, []);
+
+  return (
+    <group>
+      {[
+        [0, -4, 18],
+        [0, 9, 16],
+        [-16, 0, 14],
+        [16, 0, 14],
+      ].map(([x, z, scale], i) => (
+        <mesh
+          key={i}
+          rotation={[-Math.PI / 2, 0, 0]}
+          position={[x, 0.008, z]}
+        >
+          <planeGeometry args={[scale, scale]} />
+          <meshBasicMaterial
+            map={texture}
+            transparent
+            depthWrite={false}
+            blending={THREE.AdditiveBlending}
+            toneMapped={false}
+          />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+function FloorGrid() {
+  const ref = useRef<THREE.GridHelper>(null);
+
+  useEffect(() => {
+    if (!ref.current) return;
+    const material = ref.current.material as THREE.LineBasicMaterial;
+    material.transparent = true;
+    material.opacity = 0.07;
+    material.depthWrite = false;
+  }, []);
+
+  return (
+    <gridHelper
+      ref={ref}
+      args={[76, 38, "#d4af37", "#3b382f"]}
+      position={[0, 0.006, 0]}
+    />
+  );
+}
+
 function Floor() {
   return (
     <group>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow>
         <planeGeometry args={[76, 64]} />
-        <meshStandardMaterial color="#151515" metalness={0.2} roughness={0.7} />
+        <meshStandardMaterial color="#0f0f0e" metalness={0.28} roughness={0.62} />
       </mesh>
+      <FloorGrid />
+      <LightPools />
       {/* zone accent floor tiles */}
       {WORLD_ZONES.filter((z) => z.id !== "entry").map((z) => (
-        <mesh key={z.id} rotation={[-Math.PI / 2, 0, 0]} position={[(z.x0 + z.x1) / 2, 0.002, (z.z0 + z.z1) / 2]}>
+        <mesh key={z.id} rotation={[-Math.PI / 2, 0, 0]} position={[(z.x0 + z.x1) / 2, 0.003, (z.z0 + z.z1) / 2]}>
           <planeGeometry args={[z.x1 - z.x0, z.z1 - z.z0]} />
-          <meshBasicMaterial color={z.accent} transparent opacity={0.04} />
+          <meshBasicMaterial color={z.accent} transparent opacity={0.07} />
         </mesh>
       ))}
     </group>
@@ -87,11 +184,11 @@ function PathStrips() {
         <group key={i} position={s.pos} rotation={[0, s.rot, 0]}>
           <mesh rotation={[-Math.PI / 2, 0, 0]}>
             <planeGeometry args={[0.55, s.len]} />
-            <meshBasicMaterial color="#d4af37" transparent opacity={0.5} />
+            <meshBasicMaterial color="#f1cf7c" transparent opacity={0.62} />
           </mesh>
           <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.002, 0]}>
             <planeGeometry args={[0.8, s.len]} />
-            <meshBasicMaterial color="#d4af37" transparent opacity={0.09} />
+            <meshBasicMaterial color="#d4af37" transparent opacity={0.12} />
           </mesh>
         </group>
       ))}
@@ -155,7 +252,7 @@ function Terminal({ id }: { id: string }) {
     c.width = 512;
     c.height = 512;
     const ctx = c.getContext("2d")!;
-    ctx.fillStyle = "#020508";
+    ctx.fillStyle = "#070604";
     ctx.fillRect(0, 0, 512, 512);
     ctx.strokeStyle = t.accent;
     ctx.lineWidth = 10;
@@ -215,19 +312,19 @@ function Ceiling() {
     <group>
       <mesh position={[0, 6.4, 0]} receiveShadow>
         <boxGeometry args={[76, 0.12, 64]} />
-        <meshStandardMaterial color="#181818" metalness={0.65} roughness={0.36} />
+        <meshStandardMaterial color="#17150f" metalness={0.65} roughness={0.36} />
       </mesh>
       {/* light strips */}
       {[-24, -12, 0, 12, 24].map((x) => (
         <mesh key={x} position={[x, 6.2, 0]}>
           <boxGeometry args={[0.35, 0.06, 30]} />
-          <meshStandardMaterial color="#fff1d6" emissive="#d4af37" emissiveIntensity={1.4} toneMapped={false} />
+          <meshStandardMaterial color="#fff1d6" emissive="#e8c46a" emissiveIntensity={2.1} toneMapped={false} />
         </mesh>
       ))}
       {[-18, 0, 18].map((z) => (
         <mesh key={z} position={[0, 6.2, z]}>
           <boxGeometry args={[64, 0.06, 0.35]} />
-          <meshStandardMaterial color="#fff1d6" emissive="#d4af37" emissiveIntensity={1.0} toneMapped={false} />
+          <meshStandardMaterial color="#fff1d6" emissive="#e8c46a" emissiveIntensity={1.6} toneMapped={false} />
         </mesh>
       ))}
     </group>
@@ -239,6 +336,7 @@ export default memo(function GymWorld({ reduced }: { reduced: boolean }) {
     <group>
       <Floor />
       <Walls />
+      <WallTrim />
       <Ceiling />
       <PathStrips />
 

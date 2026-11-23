@@ -5,10 +5,10 @@ import { motion } from "framer-motion";
 import { useGame } from "./store";
 
 const STEPS = [
-  "Loading environment…",
-  "Loading equipment…",
-  "Synchronizing player…",
-  "Entering gym…",
+  "Building the arena…",
+  "Placing equipment…",
+  "Syncing your progress…",
+  "Opening the floor…",
 ];
 
 export default function LoadingScreen() {
@@ -27,7 +27,7 @@ export default function LoadingScreen() {
         clearInterval(id);
         window.setTimeout(() => {
           useGame.getState().setScreen("gym");
-          useGame.getState().setObjective("EXPLORE THE TRAINING FLOOR — VISIT A ZONE");
+          useGame.getState().setObjective("EXPLORE THE TRAINING FLOOR", false);
         }, 500);
       }
     }, 55);
@@ -35,7 +35,7 @@ export default function LoadingScreen() {
   }, [setProgress]);
 
   return (
-    <div className="absolute inset-0 z-[58] flex flex-col items-center justify-center bg-[#070708]">
+    <div className="absolute inset-0 z-[58] flex flex-col items-center justify-center bg-[#080807]">
       <motion.h1
         initial={{ opacity: 0, letterSpacing: "0.7em" }}
         animate={{ opacity: 1, letterSpacing: "0.28em" }}
@@ -50,7 +50,7 @@ export default function LoadingScreen() {
         transition={{ delay: 0.5 }}
         className="letter-spacing-game mt-6 text-[11px] text-white/60"
       >
-        INITIALIZING FITNESS SYSTEM…
+        PREPARING THE ARENA…
       </motion.p>
 
       <div className="mt-10 w-72 sm:w-96">
@@ -61,7 +61,7 @@ export default function LoadingScreen() {
         <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-white/10">
           <motion.div
             className="h-full bg-accent"
-            style={{ boxShadow: "0 0 12px rgba(74,158,255,0.8)" }}
+            style={{ boxShadow: "0 0 12px rgba(232,196,106,0.7)" }}
             animate={{ width: `${pct}%` }}
             transition={{ ease: "easeOut" }}
           />
@@ -74,7 +74,7 @@ export default function LoadingScreen() {
         transition={{ delay: 1.2 }}
         className="mt-10 text-[9px] tracking-[0.3em] text-white/25"
       >
-        42 IRON ST · GYMVERSE COMPLEX · MUMBAI
+        42 IRON ST · 6 ZONES · 14,000 SQ FT · MUMBAI
       </motion.p>
     </div>
   );

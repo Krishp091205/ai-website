@@ -16,11 +16,11 @@ const oswald = Oswald({
 export const metadata: Metadata = {
   metadataBase: new URL("https://krishp091205.github.io/ai-website"),
   title: {
-    default: "GYMVERSE — Enter the Grind",
+    default: "GYMVERSE — Train Without Apology",
     template: "%s · GYMVERSE",
   },
   description:
-    "GYMVERSE is a cinematic 3D gym experience. Explore the arena, choose your training mission, and start the grind.",
+    "GYMVERSE is a 14,000 sq ft strength and conditioning arena in Mumbai. Explore the 3D gym, choose a training mission, and book a coach.",
   keywords: [
     "gym",
     "fitness",
@@ -35,9 +35,9 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "GYMVERSE",
-    title: "GYMVERSE — Enter the Grind",
+    title: "GYMVERSE — Train Without Apology",
     description:
-      "A cinematic 3D gym experience. Explore the arena, choose your training mission, and start the grind.",
+      "A 14,000 sq ft strength and conditioning arena in Mumbai. Explore the 3D gym, choose a mission, and book a coach.",
     url: "https://krishp091205.github.io/ai-website",
     images: [
       {
@@ -50,9 +50,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "GYMVERSE — Enter the Grind",
+    title: "GYMVERSE — Train Without Apology",
     description:
-      "A cinematic 3D gym experience. Explore the arena, choose your training mission, and start the grind.",
+      "A 14,000 sq ft strength and conditioning arena in Mumbai. Explore the 3D gym, choose a mission, and book a coach.",
     images: ["https://krishp091205.github.io/ai-website/img/about.jpg"],
   },
 };
@@ -62,9 +62,9 @@ const JSON_LD = {
   "@type": "HealthClub",
   name: "GYMVERSE",
   url: "https://krishp091205.github.io/ai-website",
-  slogan: "Enter the Grind",
+  slogan: "Train Without Apology",
   description:
-    "A 14,000 sq ft strength and conditioning arena offering training programs, personal coaching, and luxury membership.",
+    "A 14,000 sq ft strength and conditioning arena in Mumbai offering five training programs, personal coaching, six facility zones, and membership tiers.",
   email: "grind@gymverse.fit",
   telephone: "+91 98200 00000",
   address: {

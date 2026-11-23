@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GYMVERSE
 
-## Getting Started
+A cinematic 3D gym experience for a 14,000 sq ft strength and conditioning arena in Mumbai.
 
-First, run the development server:
+GYMVERSE is an interactive Next.js site where visitors can enter a walkable 3D gym, explore six training zones, accept training missions, review coaches, compare memberships, and send an inquiry.
+
+## What is inside
+
+- **Walkable 3D arena** built with React Three Fiber and Three.js
+- **Six zones**: Entry, Cardio, Strength, Free Weights, Functional, Recovery, and Exit
+- **Interactive stations** with XP, progression, and HUD feedback
+- **Content terminals** for About, Programs, Trainers, Facility, Membership, and Contact
+- **Cinematic UI** with an intro sequence, loading sequence, map, settings, and profile
+
+## Local development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Because the production build uses `basePath: "/ai-website"`, the local dev route is also served under that prefix.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Production build
 
-## Learn More
+```bash
+npm run build
+```
 
-To learn more about Next.js, take a look at the following resources:
+The project uses `output: "export"`, so the static site is written to `out/`. GitHub Pages serves it at:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+`https://krishp091205.github.io/ai-website/`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Controls
 
-## Deploy on Vercel
+| Action | Desktop | Mobile |
+| --- | --- | --- |
+| Move | `W A S D` | Virtual joystick |
+| Look | Mouse | Swipe |
+| Sprint | `Shift` | — |
+| Jump | `Space` | — |
+| Interact | `E` | Tap interact |
+| Map | `M` | Map button |
+| Menu | `Esc` | Menu button |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Optional configuration
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Set `NEXT_PUBLIC_FORM_ENDPOINT` to a JSON endpoint that accepts contact form submissions. Without it, the contact form uses `mailto:` so inquiries still reach the gym.
+
+## Tech stack
+
+Next.js 16, React 19, TypeScript, Tailwind CSS 4, Three.js, React Three Fiber, drei, postprocessing, Framer Motion, GSAP, Lenis, and Zustand.

@@ -15,6 +15,7 @@ import LoadingScreen from "./LoadingScreen";
 import TouchControls from "./TouchControls";
 import GameScene from "./three/GameScene";
 import { IS_MOBILE } from "./store";
+import { initPersistence } from "./persistence";
 
 function CutsceneLines() {
   const gymEntries = useGame((s) => s.gymEntries);
@@ -78,7 +79,9 @@ export default function GameRoot() {
   }, [soundOn]);
 
   useEffect(() => {
+    const stop = initPersistence();
     if (MOTION_PREF) useGame.setState({ screen: "gym" });
+    return stop;
   }, []);
 
   useEffect(() => {
@@ -120,7 +123,7 @@ export default function GameRoot() {
   }, []);
 
   return (
-    <div className="relative h-dvh w-full overflow-hidden bg-[#070707]">
+    <div className="relative h-dvh w-full overflow-hidden bg-[#080807]">
       <GameScene />
 
       <div className="vignette" />

@@ -171,7 +171,7 @@ export default function PlayerController() {
       playerRot: yaw.current,
     });
     const zn = zoneAt(pos.current.x, pos.current.z);
-    if (zn !== st.currentZone) useGame.setState({ currentZone: zn });
+    if (zn !== st.currentZone) useGame.getState().setCurrentZone(zn);
 
     // ---- interaction detection ----
     target.current = findTarget();

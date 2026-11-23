@@ -7,8 +7,10 @@ import {
   CONTACT_INFO,
   FACILITY_ZONES,
   MEMBERSHIP,
+  PORTAL_LEDES,
   PROGRAMS,
   TRAINERS,
+  type MembershipTier,
   type Trainer,
 } from "./data";
 import { useGame } from "./store";
@@ -18,12 +20,12 @@ const META: Record<
   string,
   { index: string; title: string; subtitle: string; accent: string }
 > = {
-  about: { index: "01", title: "ABOUT", subtitle: "The story of the arena", accent: "#4a9eff" },
-  programs: { index: "02", title: "PROGRAMS", subtitle: "Choose your mission", accent: "#4a9eff" },
-  trainers: { index: "03", title: "TRAINERS", subtitle: "Coaching center roster", accent: "#4a9eff" },
-  facility: { index: "04", title: "FACILITY", subtitle: "Every zone, mapped", accent: "#4a9eff" },
-  membership: { index: "05", title: "MEMBERSHIP", subtitle: "VIP access tiers", accent: "#f59e0b" },
-  contact: { index: "06", title: "CONTACT", subtitle: "Front desk terminal", accent: "#4a9eff" },
+  about: { index: "01", title: "ABOUT", subtitle: "The arena, explained", accent: "#e8c46a" },
+  programs: { index: "02", title: "PROGRAMS", subtitle: "Choose your mission", accent: "#e8c46a" },
+  trainers: { index: "03", title: "TRAINERS", subtitle: "The coaching roster", accent: "#f8dda0" },
+  facility: { index: "04", title: "FACILITY", subtitle: "Six zones, one floor", accent: "#e8c46a" },
+  membership: { index: "05", title: "MEMBERSHIP", subtitle: "Access tiers & pricing", accent: "#ffe0a3" },
+  contact: { index: "06", title: "CONTACT", subtitle: "Book a visit", accent: "#e8c46a" },
 };
 
 export default function PortalContent() {
@@ -61,7 +63,7 @@ export default function PortalContent() {
           className="fixed inset-0 z-[52] overflow-y-auto"
           style={{
             background:
-              "radial-gradient(90% 85% at 50% 42%, rgba(5,5,8,0.82) 0%, rgba(5,5,8,0.55) 55%, rgba(5,5,8,0.3) 100%)",
+              "radial-gradient(90% 85% at 50% 42%, rgba(7,6,4,0.86) 0%, rgba(7,6,4,0.6) 55%, rgba(7,6,4,0.32) 100%)",
           }}
         >
           <div className="pointer-events-none fixed inset-x-0 top-0 h-[9vh] bg-black/85" />
@@ -83,6 +85,9 @@ export default function PortalContent() {
               <h1 className="mt-3 font-display text-5xl font-semibold tracking-[0.14em] text-white sm:text-7xl">
                 {META[portalOpen].title}
               </h1>
+              <p className="mt-5 max-w-2xl text-sm leading-7 text-white/65 sm:text-base">
+                {PORTAL_LEDES[portalOpen]}
+              </p>
             </motion.div>
 
             <div className="mt-10">{renderSection(portalOpen)}</div>
@@ -96,9 +101,9 @@ export default function PortalContent() {
               <button
                 data-cursor="RETURN"
                 onClick={close}
-                className="rounded-sm border border-line px-8 py-4 font-display text-xs tracking-[0.3em] text-white/80 transition-all hover:border-accent hover:text-white"
+                className="btn-secondary"
               >
-                ← RETURN TO GYM
+                ← BACK TO THE FLOOR
               </button>
             </motion.div>
           </div>
@@ -245,56 +250,7 @@ function renderSection(id: string) {
       );
 
     case "membership":
-      return (
-        <div className="grid gap-4 lg:grid-cols-3">
-          {MEMBERSHIP.map((tier, i) => (
-            <Stagger key={tier.id} delay={i * 0.12}>
-              <div
-                className={`hud-panel relative flex h-full flex-col rounded-sm p-3 transition-colors hover:border-accent/40 ${
-                  tier.featured ? "border-accent/50" : ""
-                }`}
-              >
-                <Feed
-                  src={tier.image}
-                  alt={`${tier.name} membership tier`}
-                  label={tier.name}
-                  aspect="aspect-[21/10]"
-                />
-                <div className="flex h-full flex-col p-4">
-                {tier.featured && (
-                  <div className="absolute top-1 left-1/2 -translate-x-1/2 rounded-sm bg-accent px-4 py-1 text-[9px] font-bold tracking-[0.28em] text-black">
-                    MOST CHOSEN
-                  </div>
-                )}
-                <h3 className="mt-3 font-display text-3xl tracking-[0.2em] text-white">
-                  {tier.name}
-                </h3>
-                <p className="mt-1 text-[10px] tracking-[0.22em] text-muted">
-                  {tier.subtitle}
-                </p>
-                <div className="mt-5 font-display text-4xl text-warm text-glow-warm">
-                  ₹{tier.price}
-                </div>
-                <ul className="mt-6 flex-1 space-y-3">
-                  {tier.perks.map((p) => (
-                    <li key={p} className="flex gap-3 text-sm text-white/75">
-                      <span className="text-accent">▸</span>
-                      {p}
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  data-cursor="SELECT"
-                  className="mt-7 rounded-sm border border-line py-3 text-[11px] tracking-[0.3em] text-white/80 transition-all hover:border-warm hover:text-warm"
-                >
-                  ENROLL — {tier.name}
-                </button>
-                </div>
-              </div>
-            </Stagger>
-          ))}
-        </div>
-      );
+      return <MembershipBody />;
 
     case "contact":
       return <ContactBody />;
@@ -418,6 +374,13 @@ function TrainersBody() {
           onBook={() => {
             sound.whoosh();
             setBooked(selected.id);
+            const subject = encodeURIComponent(
+              `GYMVERSE session request — ${selected.name}`
+            );
+            const body = encodeURIComponent(
+              `Hi GYMVERSE,\n\nI'd like to request a session with ${selected.name} (${selected.title}). Please share availability.\n\nThanks,`
+            );
+            window.location.href = `mailto:${CONTACT_INFO.email}?subject=${subject}&body=${body}`;
           }}
         />
       ) : (
@@ -519,7 +482,7 @@ function TrainerDetail({
             <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-white/8">
               <motion.div
                 className="h-full rounded-full bg-accent"
-                style={{ boxShadow: "0 0 10px rgba(74,158,255,0.6)" }}
+                style={{ boxShadow: "0 0 10px rgba(232,196,106,0.55)" }}
                 initial={{ width: "0%" }}
                 animate={{ width: `${s.value}%` }}
                 transition={{ delay: 0.2 + i * 0.12, duration: 0.9, ease: "easeOut" }}
@@ -560,6 +523,68 @@ function TrainerDetail({
   );
 }
 
+function membershipHref(tier: MembershipTier) {
+  const subject = encodeURIComponent(`GYMVERSE ${tier.name} membership`);
+  const body = encodeURIComponent(
+    `Hi GYMVERSE,\n\nI'd like to request access to the ${tier.name} membership (₹${tier.price}). Please share the next steps.\n\nThanks,`
+  );
+  return `mailto:${CONTACT_INFO.email}?subject=${subject}&body=${body}`;
+}
+
+function MembershipBody() {
+  return (
+    <div className="grid gap-4 lg:grid-cols-3">
+      {MEMBERSHIP.map((tier, i) => (
+        <Stagger key={tier.id} delay={i * 0.12}>
+          <div
+            className={`hud-panel relative flex h-full flex-col rounded-sm p-3 transition-colors hover:border-accent/40 ${
+              tier.featured ? "border-accent/60" : ""
+            }`}
+          >
+            <Feed
+              src={tier.image}
+              alt={`${tier.name} membership tier`}
+              label={tier.name}
+              aspect="aspect-[21/10]"
+            />
+            <div className="flex h-full flex-col p-4">
+              {tier.featured && (
+                <div className="absolute left-1/2 top-1 -translate-x-1/2 rounded-sm bg-accent px-4 py-1 text-[9px] font-bold tracking-[0.28em] text-accent-ink">
+                  BEST VALUE
+                </div>
+              )}
+              <h3 className="mt-3 font-display text-3xl tracking-[0.2em] text-white">
+                {tier.name}
+              </h3>
+              <p className="mt-1 text-[10px] tracking-[0.22em] text-muted">
+                {tier.subtitle}
+              </p>
+              <div className="mt-5 font-display text-4xl text-warm text-glow-warm">
+                ₹{tier.price}
+              </div>
+              <ul className="mt-6 flex-1 space-y-3">
+                {tier.perks.map((perk) => (
+                  <li key={perk} className="flex gap-3 text-sm text-white/75">
+                    <span className="text-accent">▸</span>
+                    {perk}
+                  </li>
+                ))}
+              </ul>
+              <a
+                data-cursor="REQUEST"
+                href={membershipHref(tier)}
+                className="btn-secondary mt-7 w-full"
+              >
+                REQUEST ACCESS — {tier.name}
+              </a>
+            </div>
+          </div>
+        </Stagger>
+      ))}
+    </div>
+  );
+}
+
 function ContactBody() {
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -592,7 +617,7 @@ function ContactBody() {
         });
         setSent(true);
       } catch {
-        setError("TRANSMISSION FAILED — TRY EMAIL INSTEAD");
+        setError("REQUEST FAILED — EMAIL US INSTEAD");
       } finally {
         setBusy(false);
       }
@@ -640,11 +665,11 @@ function ContactBody() {
       <Stagger delay={0.12}>
         {sent ? (
           <div className="hud-panel rounded-sm p-8 text-center">
-            <div className="font-display text-2xl tracking-[0.2em] text-emerald-400">
-              TRANSMISSION RECEIVED
+            <div className="font-display text-2xl tracking-[0.2em] text-accent">
+              REQUEST SENT
             </div>
             <p className="mt-3 text-sm text-white/70">
-              Your transmission is on its way. A coach replies within 24 hours — the grind waits for no one.
+              Your message is on its way. A coach replies within 24 hours.
             </p>
           </div>
         ) : (
@@ -666,7 +691,7 @@ function ContactBody() {
               <textarea
                 name="message"
                 rows={4}
-                placeholder="I want to know more about the TITAN membership…"
+                placeholder="I'd like to book a tour or ask about the TITAN membership…"
                 className="mt-2 w-full rounded-sm border border-line bg-black/40 px-4 py-3 text-sm text-white placeholder:text-white/25 focus:border-accent focus:outline-none"
               />
             </div>
@@ -681,7 +706,7 @@ function ContactBody() {
               disabled={busy}
               className="w-full rounded-sm bg-accent py-4 font-display text-xs tracking-[0.3em] text-black transition-colors hover:bg-white disabled:opacity-50"
             >
-              {busy ? "TRANSMITTING…" : "TRANSMIT INQUIRY"}
+              {busy ? "SENDING…" : "SEND REQUEST"}
             </button>
           </form>
         )}

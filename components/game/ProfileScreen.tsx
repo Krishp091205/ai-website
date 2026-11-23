@@ -21,7 +21,7 @@ export default function ProfileScreen({
   const enterGym = () => {
     sound.whoosh();
     setScreen("loading");
-    useGame.getState().setObjective("EXPLORE THE TRAINING FLOOR");
+    useGame.getState().setObjective("EXPLORE THE TRAINING FLOOR", false);
   };
   const startProgram = () => {
     sound.whoosh();
@@ -49,6 +49,9 @@ export default function ProfileScreen({
             <h1 className="mt-2 font-display text-5xl font-semibold tracking-[0.12em] text-white sm:text-6xl">
               {PROFILE.player}
             </h1>
+            <div className="mt-3 text-[10px] tracking-[0.24em] text-white/45">
+              PROGRESS SAVED ON THIS DEVICE
+            </div>
           </motion.div>
           <motion.div
             initial={{ opacity: 0, rotate: -90 }}
@@ -70,7 +73,7 @@ export default function ProfileScreen({
                 cy="60"
                 r="52"
                 fill="none"
-                stroke="#4a9eff"
+                stroke="#e8c46a"
                 strokeWidth="8"
                 strokeLinecap="round"
                 strokeDasharray={2 * Math.PI * 52}
@@ -80,7 +83,7 @@ export default function ProfileScreen({
                     2 * Math.PI * 52 * (1 - liveLevel / 100),
                 }}
                 transition={{ delay: 0.6, duration: 1.4, ease: "easeOut" }}
-                style={{ filter: "drop-shadow(0 0 10px rgba(74,158,255,0.6))" }}
+                style={{ filter: "drop-shadow(0 0 10px rgba(232,196,106,0.55))" }}
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -170,18 +173,18 @@ export default function ProfileScreen({
               className="flex flex-wrap items-center gap-3"
             >
               <button
-                data-cursor="ENTER GYM"
+                data-cursor="ENTER"
                 onClick={enterGym}
-                className="rounded-sm bg-accent px-8 py-4 font-display text-sm tracking-[0.28em] text-black transition-all hover:bg-white"
+                className="btn-primary"
               >
-                ENTER GYM
+                ENTER THE FLOOR
               </button>
               <button
                 data-cursor="SELECT"
                 onClick={startProgram}
-                className="rounded-sm border border-line px-8 py-4 font-display text-sm tracking-[0.28em] text-white/80 transition-all hover:border-accent/60 hover:text-white"
+                className="btn-secondary"
               >
-                START PROGRAM
+                START A PROGRAM
               </button>
               {onClose && (
                 <button
@@ -247,7 +250,7 @@ function Bar({
         style={{
           boxShadow:
             color === "accent"
-              ? "0 0 10px rgba(74,158,255,0.7)"
+              ? "0 0 10px rgba(232,196,106,0.6)"
               : "0 0 8px rgba(255,255,255,0.4)",
         }}
         initial={{ width: "0%" }}

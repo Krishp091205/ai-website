@@ -263,7 +263,7 @@ function Slider({
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
         aria-label={label}
-        className="range mt-3 w-full accent-[#4a9eff]"
+        className="range mt-3 w-full accent-[#e8c46a]"
       />
     </div>
   );

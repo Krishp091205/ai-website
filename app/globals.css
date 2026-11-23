@@ -1,23 +1,27 @@
 @import "tailwindcss";
 
 :root {
-  --background: #070707;
-  --foreground: #f4f4f5;
-  --accent: #4a9eff;
-  --warm: #f59e0b;
-  --charcoal: #161616;
-  --steel: #2d2d2d;
-  --steel-2: #3d3d3d;
-  --muted: #a1a1aa;
-  --panel: rgba(22, 22, 22, 0.72);
-  --line: rgba(255, 255, 255, 0.09);
-  --line-strong: rgba(255, 255, 255, 0.18);
+  --background: #080807;
+  --foreground: #f5f0e7;
+  --accent: #e8c46a;
+  --accent-strong: #f8dda0;
+  --accent-ink: #141006;
+  --warm: #ffe0a3;
+  --charcoal: #121110;
+  --steel: #2a2823;
+  --steel-2: #3b382f;
+  --muted: #a8a39a;
+  --panel: rgba(14, 13, 11, 0.8);
+  --line: rgba(232, 196, 106, 0.15);
+  --line-strong: rgba(232, 196, 106, 0.36);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-ink: var(--accent-ink);
   --color-warm: var(--warm);
   --color-charcoal: var(--charcoal);
   --color-steel: var(--steel);
@@ -38,7 +42,9 @@ html {
 }
 
 body {
-  background: radial-gradient(120% 120% at 50% 0%, #0d0d0f 0%, #070707 55%);
+  background:
+    radial-gradient(120% 90% at 50% -10%, rgba(232, 196, 106, 0.08) 0%, transparent 48%),
+    radial-gradient(120% 120% at 50% 0%, #11100d 0%, #080807 58%);
   color: var(--foreground);
   font-family: var(--font-sans);
   overflow: hidden;
@@ -47,7 +53,7 @@ body {
 }
 
 ::selection {
-  background: rgba(74, 158, 255, 0.35);
+  background: rgba(232, 196, 106, 0.32);
   color: #fff;
 }
 
@@ -81,16 +87,102 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--accent-strong);
   outline-offset: 3px;
   border-radius: 2px;
 }
 
+/* Shared surface and type primitives -------------------------------------- */
 .hud-panel {
   background: var(--panel);
   border: 1px solid var(--line);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.eyebrow {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.34em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.gold-rule {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--line-strong), transparent);
+}
+
+.hero-scrim {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(7, 6, 4, 0.92) 0%, rgba(7, 6, 4, 0.68) 38%, transparent 78%),
+    linear-gradient(0deg, rgba(7, 6, 4, 0.92) 0%, transparent 44%),
+    linear-gradient(180deg, rgba(7, 6, 4, 0.7) 0%, transparent 22%);
+}
+
+.btn-primary,
+.btn-secondary,
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  min-height: 52px;
+  padding: 0.9rem 1.6rem;
+  border-radius: 2px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  line-height: 1;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.btn-primary {
+  border: 1px solid var(--accent-strong);
+  background: var(--accent);
+  color: var(--accent-ink);
+  box-shadow: 0 14px 44px rgba(232, 196, 106, 0.18);
+}
+.btn-primary:hover {
+  background: var(--accent-strong);
+  transform: translateY(-2px);
+  box-shadow: 0 18px 54px rgba(232, 196, 106, 0.28);
+}
+
+.btn-secondary {
+  border: 1px solid var(--line-strong);
+  background: rgba(232, 196, 106, 0.06);
+  color: var(--foreground);
+}
+.btn-secondary:hover {
+  border-color: var(--accent);
+  background: rgba(232, 196, 106, 0.14);
+  transform: translateY(-2px);
+}
+
+.btn-ghost {
+  border: 1px solid transparent;
+  background: transparent;
+  color: rgba(245, 240, 231, 0.66);
+}
+.btn-ghost:hover {
+  border-color: var(--line);
+  color: var(--foreground);
 }
 
 .clip-display {
@@ -106,8 +198,8 @@ body {
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(115% 105% at 50% 50%, transparent 58%, rgba(0, 0, 0, 0.55) 100%),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.42), transparent 12%, transparent 88%, rgba(0, 0, 0, 0.5));
+    radial-gradient(115% 105% at 50% 50%, transparent 57%, rgba(0, 0, 0, 0.62) 100%),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.46), transparent 14%, transparent 86%, rgba(0, 0, 0, 0.56));
   z-index: 40;
 }
 
@@ -118,8 +210,8 @@ body {
   z-index: 41;
   background: repeating-linear-gradient(
     0deg,
-    rgba(255, 255, 255, 0.022) 0px,
-    rgba(255, 255, 255, 0.022) 1px,
+    rgba(255, 255, 255, 0.018) 0px,
+    rgba(255, 255, 255, 0.018) 1px,
     transparent 1px,
     transparent 4px
   );
@@ -136,11 +228,11 @@ body {
 }
 
 .text-glow {
-  text-shadow: 0 0 18px rgba(74, 158, 255, 0.45);
+  text-shadow: 0 0 18px rgba(232, 196, 106, 0.4);
 }
 
 .text-glow-warm {
-  text-shadow: 0 0 18px rgba(245, 158, 11, 0.4);
+  text-shadow: 0 0 18px rgba(255, 224, 163, 0.38);
 }
 
 .thin-line {
@@ -155,17 +247,17 @@ body {
   text-transform: uppercase;
   font-family: var(--font-tungsten), var(--font-inter), sans-serif;
   letter-spacing: 0.22em;
-  color: rgba(244, 244, 245, 0.62);
+  color: rgba(245, 240, 231, 0.62);
   transition: color 0.25s ease, transform 0.25s ease, padding-left 0.25s ease;
 }
 
 .menu-item:hover {
-  color: #ffffff;
+  color: #fff;
   padding-left: 14px;
 }
 
 .menu-item-active {
-  color: #ffffff;
+  color: #fff;
   padding-left: 14px;
 }
 
@@ -178,7 +270,7 @@ body {
   width: 12px;
   height: 2px;
   background: var(--accent);
-  box-shadow: 0 0 10px rgba(74, 158, 255, 0.8);
+  box-shadow: 0 0 10px rgba(232, 196, 106, 0.75);
 }
 
 @keyframes hudPulse {
@@ -221,11 +313,13 @@ body {
 .shimmer-text {
   background: linear-gradient(
     100deg,
-    #fff 20%,
-    rgba(74, 158, 255, 0.95) 40%,
-    #fff 60%
+    #fff1d6 18%,
+    rgba(232, 196, 106, 0.98) 38%,
+    #fff8e8 52%,
+    rgba(232, 196, 106, 0.98) 66%,
+    #fff1d6 86%
   );
-  background-size: 200% 100%;
+  background-size: 220% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -244,6 +338,7 @@ body {
 
 html[data-cb="true"] {
   --accent: #00b4d8;
+  --accent-strong: #7df3ff;
   --warm: #ffe14d;
 }
 

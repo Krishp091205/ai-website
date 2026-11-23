@@ -108,7 +108,7 @@ export default function CameraRig() {
       camera.rotation.z = 0;
     } else {
       // Third-person follow with smooth orbit
-      const dist = 3.6;
+      const dist = 3.25;
       const cosY = Math.cos(smoothYaw.current);
       const sinY = Math.sin(smoothYaw.current);
       const cosP = Math.cos(smoothPitch.current + 0.08);
@@ -124,7 +124,7 @@ export default function CameraRig() {
       pos.current.y += (desired.y - pos.current.y) * damp;
       pos.current.z += (desired.z - pos.current.z) * damp;
       camera.position.copy(pos.current);
-      const lookAt = basePos.clone().add(new THREE.Vector3(0, 1.35, 0));
+      const lookAt = basePos.clone().add(new THREE.Vector3(0, 1.45, 0));
       camera.lookAt(lookAt);
       // subtle orbit lag on yaw
       camera.rotation.y = smoothYaw.current;

@@ -29,6 +29,18 @@ export interface FlyTarget {
 
 export type Quality = "low" | "medium" | "high" | "ultra";
 
+export interface MissionState {
+  id: string;
+  accepted: boolean;
+  status: "active" | "completed";
+  startedAt: number;
+  progress: number;
+  completedExercises: string[];
+  xpReward: number;
+  xpEarned: number;
+  completedAt: number | null;
+}
+
 export interface Settings {
   sound: boolean;
   music: boolean;
@@ -80,6 +92,10 @@ interface GameState {
   interactingId: string | null;
   feedback: Feedback[];
   locked: boolean;
+  missions: Record<string, MissionState>;
+  visitedZones: WorldZoneId[];
+  /** increments whenever the player is teleported (e.g. from the gym map) */
+  teleportSeq: number;
 
   setScreen: (s: Screen) => void;
   setReplayIntro: (v: boolean) => void;
@@ -103,6 +119,48 @@ interface GameState {
   beginWorkout: (id: string, xp: number, fitness: number, label: string) => void;
   completeWorkout: (id: string, xp: number) => void;
   resetProgression: () => void;
+  acceptMission: (id: string, xpReward: number) => void;
+  toggleMissionExercise: (id: string, exercise: string, total: number) => void;
+  completeMission: (id: string) => void;
+  enterZone: (zone: WorldZoneId) => void;
+  teleportTo: (pos: [number, number, number], zone: WorldZoneId) => void;
+}
+
+const LEVEL_THRESHOLDS = [500, 1200, 2400, 4000, 6000, 8500, 12000, 17000, 24000];
+
+const ZONE_LABEL: Record<WorldZoneId, string> = {
+  entry: "ENTRY",
+  cardio: "CARDIO",
+  strength: "STRENGTH",
+  weights: "FREE WEIGHTS",
+  functional: "FUNCTIONAL",
+  recovery: "RECOVERY",
+  exit: "EXIT",
+};
+
+const EXPLORABLE_ZONES: WorldZoneId[] = [
+  "cardio",
+  "strength",
+  "weights",
+  "functional",
+  "recovery",
+  "exit",
+];
+
+function applyXp(level: number, xpInto: number, amount: number) {
+  let nextLevel = level;
+  let nextXp = xpInto + amount;
+  let leveled = false;
+  let guard = 0;
+  while (guard++ < 20) {
+    const need = LEVEL_THRESHOLDS[nextLevel - 1] ?? 6000 + (nextLevel - 10) * 1500;
+    if (nextXp >= need) {
+      nextXp -= need;
+      nextLevel += 1;
+      leveled = true;
+    } else break;
+  }
+  return { xp: nextXp, level: nextLevel, leveled };
 }
 
 export const useGame = create<GameState>((set, get) => ({
@@ -133,6 +191,9 @@ export const useGame = create<GameState>((set, get) => ({
   interactingId: null,
   feedback: [],
   locked: false,
+  missions: {},
+  visitedZones: [],
+  teleportSeq: 0,
 
   settings: {
     sound: false,
@@ -144,7 +205,7 @@ export const useGame = create<GameState>((set, get) => ({
     viewMode: "third",
     mouseSensitivity: 1,
     cameraSensitivity: 1,
-    fov: 68,
+    fov: 64,
     motionBlur: true,
     sfx: true,
   },
@@ -202,13 +263,18 @@ export const useGame = create<GameState>((set, get) => ({
   setObjective: (objective, done = false) => set({ objective, objectiveDone: done }),
   setSettings: (s) => {
     const next = { ...get().settings, ...s };
-    set({ settings: next, viewMode: next.viewMode });
+    set({ settings: next, viewMode: next.viewMode ?? get().viewMode });
   },
   setLoadingProgress: (p) => set({ loadingProgress: p }),
   setPlayerPos: (p) => set({ playerPos: p }),
   setPlayerRot: (r) => set({ playerRot: r }),
   setViewMode: (v) => set({ viewMode: v, settings: { ...get().settings, viewMode: v } }),
-  setCurrentZone: (z) => set({ currentZone: z }),
+  setCurrentZone: (z) => {
+    const st = get();
+    if (st.currentZone === z) return;
+    set({ currentZone: z });
+    get().enterZone(z);
+  },
   setInteraction: (id, label = null) =>
     set({ interactingId: id, interaction: label }),
   setLocked: (v) => set({ locked: v }),
@@ -224,38 +290,25 @@ export const useGame = create<GameState>((set, get) => ({
 
   completeWorkout: (id, xp) => {
     const s = get();
-    const newXp = s.xp + xp;
+    const res = applyXp(s.level, s.xp, xp);
     const newFitness = Math.min(100, s.fitnessScore + 1);
-    let level = s.level;
-    let xpInto = newXp;
-    let leveled = false;
-    const thresholds = [500, 1200, 2400, 4000, 6000, 8500, 12000, 17000, 24000];
-    let guard = 0;
-    while (guard++ < 20) {
-      const need = thresholds[level - 1] ?? 6000 + (level - 10) * 1500;
-      if (xpInto >= need) {
-        xpInto -= need;
-        level += 1;
-        leveled = true;
-      } else break;
-    }
     const msgs: string[] = [`+${xp} XP`, "WORKOUT COMPLETE"];
-    if (leveled) msgs.push("LEVEL UP!");
+    if (res.leveled) msgs.push("LEVEL UP!");
     const seq = msgs.map((text, i) => ({
       id: Date.now() + i + Math.random(),
       text,
-      accent: text === "LEVEL UP!" ? "#f59e0b" : text.startsWith("+") ? "#4a9eff" : "#7df3ff",
+      accent: text === "LEVEL UP!" ? "#ffe0a3" : text.startsWith("+") ? "#e8c46a" : "#fff1d6",
     }));
     set({
-      xp: xpInto,
-      level,
+      xp: res.xp,
+      level: res.level,
       fitnessScore: newFitness,
       streak: s.streak + 1,
       feedback: [...s.feedback.slice(-2), ...seq],
       interactingId: null,
       interaction: null,
     });
-    if (leveled) {
+    if (res.leveled) {
       window.setTimeout(() => {
         useGame.setState({ flash: "bright" });
         window.setTimeout(() => useGame.setState({ flash: null }), 600);
@@ -264,7 +317,109 @@ export const useGame = create<GameState>((set, get) => ({
   },
 
   resetProgression: () =>
-    set({ level: 27, fitnessScore: 87, xp: 4820, streak: 4 }),
+    set({ level: 27, fitnessScore: 87, xp: 4820, streak: 4, missions: {}, visitedZones: [] }),
+
+  acceptMission: (id, xpReward) => {
+    const s = get();
+    if (s.missions[id]?.accepted) return;
+    const now = Date.now();
+    set({
+      missions: {
+        ...s.missions,
+        [id]: {
+          id,
+          accepted: true,
+          status: "active",
+          startedAt: now,
+          progress: 0,
+          completedExercises: [],
+          xpReward,
+          xpEarned: 0,
+          completedAt: null,
+        },
+      },
+      objective: "COMPLETE YOUR ACCEPTED MISSION",
+      objectiveDone: false,
+    });
+  },
+
+  toggleMissionExercise: (id, exercise, total) => {
+    const s = get();
+    const m = s.missions[id];
+    if (!m || m.status === "completed") return;
+    const exists = m.completedExercises.includes(exercise);
+    const completedExercises = exists
+      ? m.completedExercises.filter((x) => x !== exercise)
+      : [...m.completedExercises, exercise];
+    const progress = total > 0 ? Math.round((completedExercises.length / total) * 100) : m.progress;
+    set({
+      missions: {
+        ...s.missions,
+        [id]: { ...m, completedExercises, progress },
+      },
+    });
+  },
+
+  completeMission: (id) => {
+    const s = get();
+    const m = s.missions[id];
+    if (!m || m.status === "completed") return;
+    const res = applyXp(s.level, s.xp, m.xpReward);
+    const now = Date.now();
+    const msgs = [`+${m.xpReward} XP`, "MISSION COMPLETE"];
+    if (res.leveled) msgs.push("LEVEL UP!");
+    const seq = msgs.map((text, i) => ({
+      id: Date.now() + i + Math.random(),
+      text,
+      accent: text === "LEVEL UP!" ? "#ffe0a3" : text.startsWith("+") ? "#e8c46a" : "#fff1d6",
+    }));
+    set({
+      missions: {
+        ...s.missions,
+        [id]: { ...m, status: "completed", progress: 100, xpEarned: m.xpReward, completedAt: now },
+      },
+      xp: res.xp,
+      level: res.level,
+      feedback: [...s.feedback.slice(-2), ...seq],
+      objective: "MISSION COMPLETE — CONTINUE EXPLORING",
+      objectiveDone: true,
+    });
+    if (res.leveled) {
+      window.setTimeout(() => {
+        useGame.setState({ flash: "bright" });
+        window.setTimeout(() => useGame.setState({ flash: null }), 600);
+      }, 300);
+    }
+  },
+
+  enterZone: (zone) => {
+    const s = get();
+    if (zone === "entry") return;
+    const visited = s.visitedZones.includes(zone) ? s.visitedZones : [...s.visitedZones, zone];
+    if (visited.length === 1 && !s.objectiveDone) {
+      set({
+        visitedZones: visited,
+        objective: "EXPLORE THE TRAINING FLOOR",
+        objectiveDone: false,
+      });
+      return;
+    }
+    if (visited.length >= 2 && s.objective === "EXPLORE THE TRAINING FLOOR" && !s.objectiveDone) {
+      set({ visitedZones: visited, objective: "EXPLORE THE TRAINING FLOOR — VISIT A ZONE", objectiveDone: false });
+      return;
+    }
+    set({ visitedZones: visited });
+  },
+
+  teleportTo: (pos, zone) => {
+    set({
+      playerPos: pos,
+      currentZone: zone,
+      teleportSeq: get().teleportSeq + 1,
+      locked: false,
+    });
+    get().enterZone(zone);
+  },
 }));
 
 export const MOTION_PREF = typeof window !== "undefined"

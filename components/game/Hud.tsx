@@ -104,7 +104,7 @@ export default function Hud({ onProfile }: { onProfile: () => void }) {
               <div className="h-1 overflow-hidden rounded-full bg-white/10">
                 <motion.div
                   className="h-full bg-accent"
-                  style={{ boxShadow: "0 0 10px rgba(74,158,255,0.7)" }}
+                  style={{ boxShadow: "0 0 10px rgba(232,196,106,0.6)" }}
                   animate={{ width: `${Math.min(100, (xp / 6400) * 100)}%` }}
                   transition={{ duration: 0.6, ease: "easeOut" }}
                 />
@@ -211,7 +211,7 @@ export default function Hud({ onProfile }: { onProfile: () => void }) {
                 aria-label={soundOn ? "Mute sound" : "Enable sound"}
                 className="hud-panel no-pointer-lock rounded-sm px-3 py-2 text-[10px] font-semibold tracking-[0.2em] text-white/80 transition-colors hover:border-accent/40 hover:text-white"
               >
-                {soundOn ? "🔊" : "🔇"}
+                {soundOn ? "AUDIO" : "MUTED"}
               </button>
             </div>
           </motion.div>
